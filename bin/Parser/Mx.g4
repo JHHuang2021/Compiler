@@ -33,33 +33,36 @@ expression:
 	| New type															# newExpr
 	| expression op = ('++' | '--')										# unaryExpr
 	| op = ('++' | '--' | '!' | '~' | '-') expression					# unaryExpr
-	| expression op = ('+' | '-' | '*' | '/' | '<<' | '>>') expression	# binaryExpr
+	| expression op = ('*' | '/' | '+' | '-' | '<<' | '>>') expression	# binaryExpr
 	| expression op = (
-		'=='
-		| '!='
-		| '<'
+		'<'
 		| '>'
 		| '<='
 		| '>='
+		| '=='
+		| '!='
 		| '&&'
 		| '||'
 	) expression				# binaryExpr
 	| expression '=' expression	# assignExpr
-	| funcCall					# functionCallExpr
-	| This						# this;
+	| funcCall					# functionCallExpr;
 
 primary:
-	'(' expression ')'
+	literal
+	| This
+	| '(' expression ')'
 	| Identifier ('[' expression ']')*
-	| literal;
+	| lambdaExpression;
+
+argDef: (type Identifier)? (',' type Identifier)*;
+arg: expression? ( ',' expression)*;
+lambdaExpression:
+	'[' '&'? ']' ('(' argDef ')')? '->' suite '(' arg ')';
 
 funcCall:
-	((Identifier ('[' expression ']')*) '.')* Identifier '(' expression? (
-		',' expression
-	)* ')'
-	| Identifier '(' expression? (',' expression)* ')';
-funcDef:
-	type? Identifier '(' (type Identifier)? (',' type Identifier)* ')' suite;
+	((Identifier ('[' expression ']')*) '.')* Identifier '(' arg ')'
+	| Identifier '(' arg ')';
+funcDef: type? Identifier '(' argDef ')' suite;
 
 literal:
 	DecimalInteger
@@ -67,12 +70,9 @@ literal:
 	| StringConstant
 	| NullConstant;
 
-type:
-	Int
-	| Bool
-	| String
-	| Identifier
-	| type '[' expression? ']';
+type: basicType | array;
+basicType: Int | Bool | String | Identifier;
+array: basicType '[]'+;
 
 Break: 'break';
 Continue: 'continue';
@@ -129,7 +129,8 @@ Identifier: [a-zA-Z] [a-zA-Z_0-9]*;
 
 DecimalInteger: [1-9] [0-9]* | '0';
 BoolConstant: 'true' | 'false';
-StringConstant: '"' .*? '"';
+StringConstant: '"' (ESC | .)*? '"';
+fragment ESC: '\\"' | '\\\\';
 NullConstant: 'null';
 
 Whitespace: [ \t]+ -> skip;

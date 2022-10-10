@@ -1,4 +1,4 @@
-import java.util.Arrays;
+// import java.util.Arrays;
 // import AST.RootNode;
 // import Assembly.AsmFn;
 // import Backend.*;
@@ -15,7 +15,7 @@ import Util.error.error;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.gui.TreeViewer;
+// import org.antlr.v4.gui.TreeViewer;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
@@ -40,9 +40,10 @@ public class Main {
             System.out.println(parseTreeRoot.toStringTree(parser));
 
             // show AST in GUI
-            TreeViewer viewr = new TreeViewer(Arrays.asList(
-                    parser.getRuleNames()), parseTreeRoot);
-            viewr.open();
+            // TreeViewer viewr = new TreeViewer(Arrays.asList(
+            //         parser.getRuleNames()), parseTreeRoot);
+            // viewr.open();
+
             // ASTBuilder astBuilder = new ASTBuilder(gScope);
             // ASTRoot = (RootNode)astBuilder.visit(parseTreeRoot);
             // new SymbolCollector(gScope).visit(ASTRoot);
