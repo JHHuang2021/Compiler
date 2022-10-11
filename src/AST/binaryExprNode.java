@@ -1,6 +1,5 @@
 package AST;
 
-import Util.Type;
 import Util.position;
 
 public class binaryExprNode extends ExprNode {
@@ -12,7 +11,7 @@ public class binaryExprNode extends ExprNode {
 
     public binaryOpType opCode;
 
-    public binaryExprNode(ExprNode lhs, ExprNode rhs, binaryOpType opCode, Type intType, position pos) {
+    public binaryExprNode(ExprNode lhs, ExprNode rhs, binaryOpType opCode, TypeNode intType, position pos) {
         super(pos);
         this.lhs = lhs;
         this.rhs = rhs;

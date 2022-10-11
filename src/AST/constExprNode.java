@@ -2,12 +2,10 @@ package AST;
 
 import Util.position;
 
-import Util.Type;
-
 public class constExprNode<T> extends ExprNode {
     public T value;
 
-    public constExprNode(T value, Type constType, position pos) {
+    public constExprNode(T value, TypeNode constType, position pos) {
         super(pos);
         this.value = value;
         type = constType;

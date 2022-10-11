@@ -24,4 +24,5 @@ public interface ASTVisitor {
     void visit(varExprNode it);
     void visit(funcCallExprNode it);
     void visit(thisExprNode it);
+    void visit(TypeNode typeNode);
 }

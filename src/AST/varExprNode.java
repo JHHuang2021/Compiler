@@ -8,7 +8,7 @@ public class varExprNode extends ExprNode {
     public boolean ifthis = false;
     public String name;
     public int dim = 0;
-    public ArrayList<Integer> dimArgs = null;
+    public ArrayList<ExprNode> dimArgs = null;
 
     public varExprNode(position pos) {
         super(pos);
@@ -20,7 +20,7 @@ public class varExprNode extends ExprNode {
         this.name = name;
     }
 
-    public varExprNode(String name, int dim, ArrayList<Integer> dimArgs, position pos) {
+    public varExprNode(String name, int dim, ArrayList<ExprNode> dimArgs, position pos) {
         super(pos);
         this.name = name;
         this.dim = dim;

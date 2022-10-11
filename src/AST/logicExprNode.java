@@ -1,6 +1,5 @@
 package AST;
 
-import Util.Type;
 import Util.position;
 
 public class logicExprNode extends ExprNode {
@@ -12,7 +11,7 @@ public class logicExprNode extends ExprNode {
 
     public logicOpType opCode;
 
-    public logicExprNode(ExprNode lhs, ExprNode rhs, logicOpType opCode, Type boolType, position pos) {
+    public logicExprNode(ExprNode lhs, ExprNode rhs, logicOpType opCode, TypeNode boolType, position pos) {
         super(pos);
         this.lhs = lhs;
         this.rhs = rhs;

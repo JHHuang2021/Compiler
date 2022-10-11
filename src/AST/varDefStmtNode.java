@@ -3,15 +3,15 @@ package AST;
 import java.util.ArrayList;
 
 import Util.position;
-import Util.Type;
 
 public class varDefStmtNode extends StmtNode {
     public static class Var {
-        Type type;
+        // Type type;
+        TypeNode type;
         String name;
         ExprNode init;
 
-        public Var(Type type, String name, ExprNode init) {
+        public Var(TypeNode type, String name, ExprNode init) {
             this.type = type;
             this.name = name;
             this.init = init;

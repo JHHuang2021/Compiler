@@ -1,10 +1,9 @@
 package AST;
 
 import Util.position;
-import Util.Type;
 
 public class newExprNode extends ExprNode {
-    public newExprNode(Type newType, position pos) {
+    public newExprNode(TypeNode newType, position pos) {
         super(pos);
         this.type = newType;
     }
