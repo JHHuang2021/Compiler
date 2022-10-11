@@ -1,15 +1,30 @@
 package AST;
 
+import java.util.ArrayList;
+
 import Util.position;
 
-
 public class varExprNode extends ExprNode {
+    public boolean ifthis = false;
     public String name;
+    public int dim = 0;
+    public ArrayList<Integer> dimArgs = null;
+
+    public varExprNode(position pos) {
+        super(pos);
+        this.ifthis = true;
+    }
 
     public varExprNode(String name, position pos) {
         super(pos);
         this.name = name;
-        type = null;
+    }
+
+    public varExprNode(String name, int dim, ArrayList<Integer> dimArgs, position pos) {
+        super(pos);
+        this.name = name;
+        this.dim = dim;
+        this.dimArgs = dimArgs;
     }
 
     @Override
@@ -18,5 +33,7 @@ public class varExprNode extends ExprNode {
     }
 
     @Override
-    public boolean isAssignable() {return true;}
+    public boolean isAssignable() {
+        return true;
+    }
 }

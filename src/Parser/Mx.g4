@@ -9,15 +9,15 @@ varDef:
 classDef: Class Identifier '{' varDef* '}' ';';
 
 suite: '{' statement* '}';
-
+body: (statement | suite);
+forexpr1: (varDef | expression)?;
 statement:
 	suite		# block
 	| varDef	# vardefStmt
-	| If '(' expression ')' (statement | suite) (
-		Else statement
-		| suite
+	| If '(' expression ')' thensent = body (
+		Else elsesent = body
 	)? # ifStmt
-	| For '(' (varDef | expression)? ';' expression? ';' expression? ')' (
+	| For '(' forexpr1 ';' forexpr2 = expression? ';' forexpr3 = expression? ')' (
 		statement
 		| suite
 	)												# forStmt
@@ -29,23 +29,17 @@ statement:
 	| ';'											# emptyStmt;
 
 expression:
-	primary																# atomExpr
-	| New type															# newExpr
-	| expression op = ('++' | '--')										# unaryExpr
-	| op = ('++' | '--' | '!' | '~' | '-') expression					# unaryExpr
-	| expression op = ('*' | '/' | '+' | '-' | '<<' | '>>') expression	# binaryExpr
-	| expression op = (
-		'<'
-		| '>'
-		| '<='
-		| '>='
-		| '=='
-		| '!='
-		| '&&'
-		| '||'
-	) expression				# binaryExpr
-	| expression '=' expression	# assignExpr
-	| funcCall					# functionCallExpr;
+	primary																	# atomExpr
+	| New typewitharg														# newExpr
+	| expression afterop = ('++' | '--')									# unaryExpr
+	| beforeop = ('++' | '--' | '~' | '-') expression						# unaryExpr
+	| op = '!' expression													# logicExpr
+	| expression op = ('*' | '/' | '+' | '-' | '<<' | '>>') expression		# arithExpr
+	| expression op = ('==' | '!=' | '<' | '>' | '<=' | '>=') expression	# logicExpr
+	| expression op = ('&' | '^' | '|') expression							# bitExpr
+	| expression op = ('&&' | '||') expression								# logicExpr
+	| expression '=' expression												# assignExpr
+	| funcCall																# functionCallExpr;
 
 primary:
 	literal
@@ -71,8 +65,10 @@ literal:
 	| NullConstant;
 
 type: basicType | array;
+typewitharg: basicType | arraywitharg;
 basicType: Int | Bool | String | Identifier;
 array: basicType '[]'+;
+arraywitharg: basicType ('[' Int ']')+;
 
 Break: 'break';
 Continue: 'continue';
