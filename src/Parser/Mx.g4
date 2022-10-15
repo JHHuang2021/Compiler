@@ -36,7 +36,7 @@ expression:
 	| op = '!' expression													# logicExpr
 	| expression op = ('*' | '/' | '+' | '-' | '<<' | '>>') expression		# arithExpr
 	| expression op = ('==' | '!=' | '<' | '>' | '<=' | '>=') expression	# logicExpr
-	| expression op = ('&' | '^' | '|') expression							# bitExpr
+	| expression op = ('&' | '^' | '|') expression							# arithExpr
 	| expression op = ('&&' | '||') expression								# logicExpr
 	| expression '=' expression												# assignExpr
 	| funcCall																# functionCallExpr
@@ -52,10 +52,8 @@ argDef: (type Identifier)? (',' type Identifier)*;
 arg: expression? ( ',' expression)*;
 lambdaExpression:
 	'[' '&'? ']' ('(' argDef ')')? '->' suite '(' arg ')';
-
-funcCall:
-	((Identifier ('[' expression ']')*) '.')* Identifier '(' arg ')'
-	| Identifier '(' arg ')';
+classPref: ((Identifier ('[' expression ']')*) '.')*;
+funcCall: classPref Identifier '(' arg ')';
 funcDef: type? Identifier '(' argDef ')' suite;
 
 literal:

@@ -11,6 +11,14 @@ public class TypeNode extends ASTNode {
         this.type = type;
     }
 
+    public String ToString() {
+        return type.typeName;
+    }
+
+    public Type GetType() {
+        return type;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

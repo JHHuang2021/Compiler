@@ -1,20 +1,21 @@
+
 // import java.util.Arrays;
-// import AST.RootNode;
 // import Assembly.AsmFn;
 // import Backend.*;
-// import Frontend.ASTBuilder;
-// import Frontend.SemanticChecker;
-// import Frontend.SymbolCollector;
 // import MIR.block;
 // import MIR.mainFn;
 import Parser.MxLexer;
 import Parser.MxParser;
 import Util.MxErrorListener;
+import Util.globalScope;
 import Util.error.error;
-// import Util.globalScope;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import AST.RootNode;
+import Frontend.*;
+
 // import org.antlr.v4.gui.TreeViewer;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -26,8 +27,8 @@ public class Main {
         InputStream input = new FileInputStream(name);
 
         try {
-            // RootNode ASTRoot;
-            // globalScope gScope = new globalScope(null);
+            RootNode ASTRoot;
+            globalScope gScope = new globalScope(null);
 
             MxLexer lexer = new MxLexer(CharStreams.fromStream(input));
             lexer.removeErrorListeners();
@@ -41,13 +42,14 @@ public class Main {
 
             // show AST in GUI
             // TreeViewer viewr = new TreeViewer(Arrays.asList(
-            //         parser.getRuleNames()), parseTreeRoot);
+            // parser.getRuleNames()), parseTreeRoot);
             // viewr.open();
 
-            // ASTBuilder astBuilder = new ASTBuilder(gScope);
-            // ASTRoot = (RootNode)astBuilder.visit(parseTreeRoot);
-            // new SymbolCollector(gScope).visit(ASTRoot);
-            // new SemanticChecker(gScope).visit(ASTRoot);
+            ASTBuilder astBuilder = new ASTBuilder(gScope);
+            ASTRoot = (RootNode) astBuilder.visit(parseTreeRoot);
+            System.out.println("test");
+            new SymbolCollector(gScope).visit(ASTRoot);
+            new SemanticChecker(gScope).visit(ASTRoot);
 
             // mainFn f = new mainFn();
             // new IRBuilder(f, gScope).visit(ASTRoot);

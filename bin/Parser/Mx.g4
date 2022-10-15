@@ -30,31 +30,30 @@ statement:
 
 expression:
 	primary																	# atomExpr
-	| New type																# newExpr
-	| expression op = ('++' | '--')											# unaryExpr
-	| op = ('++' | '--' | '!' | '~' | '-') expression						# unaryExpr
+	| New typewitharg														# newExpr
+	| expression afterop = ('++' | '--')									# unaryExpr
+	| beforeop = ('++' | '--' | '~' | '-') expression						# unaryExpr
+	| op = '!' expression													# logicExpr
 	| expression op = ('*' | '/' | '+' | '-' | '<<' | '>>') expression		# arithExpr
 	| expression op = ('==' | '!=' | '<' | '>' | '<=' | '>=') expression	# logicExpr
-	| expression op = ('&' | '^' | '|') expression							# bitExpr
+	| expression op = ('&' | '^' | '|') expression							# arithExpr
 	| expression op = ('&&' | '||') expression								# logicExpr
 	| expression '=' expression												# assignExpr
-	| funcCall																# functionCallExpr;
+	| funcCall																# functionCallExpr
+	| lambdaExpression														# lambda;
 
 primary:
 	literal
 	| This
 	| '(' expression ')'
-	| Identifier ('[' expression ']')*
-	| lambdaExpression;
+	| Identifier ('[' expression ']')*;
 
 argDef: (type Identifier)? (',' type Identifier)*;
 arg: expression? ( ',' expression)*;
 lambdaExpression:
 	'[' '&'? ']' ('(' argDef ')')? '->' suite '(' arg ')';
-
-funcCall:
-	((Identifier ('[' expression ']')*) '.')* Identifier '(' arg ')'
-	| Identifier '(' arg ')';
+classPref: ((Identifier ('[' expression ']')*) '.')*;
+funcCall: classPref Identifier '(' arg ')';
 funcDef: type? Identifier '(' argDef ')' suite;
 
 literal:
@@ -64,8 +63,10 @@ literal:
 	| NullConstant;
 
 type: basicType | array;
+typewitharg: basicType | arraywitharg;
 basicType: Int | Bool | String | Identifier;
 array: basicType '[]'+;
+arraywitharg: basicType ('[' Int ']')+;
 
 Break: 'break';
 Continue: 'continue';
@@ -87,6 +88,7 @@ LeftBracket: '[';
 RightBracket: ']';
 LeftBrace: '{';
 RightBrace: '}';
+Dim: '[]';
 
 Less: '<';
 LessEqual: '<=';

@@ -1,6 +1,5 @@
 package AST;
 
-import Util.Type;
 import Util.position;
 
 import java.util.ArrayList;
@@ -8,10 +7,10 @@ import java.util.ArrayList;
 public class FnNode extends ASTNode {
     public ArrayList<StmtNode> stmts;
     public ArrayList<varDefStmtNode> argsDef;
-    public Type retType;
+    public TypeNode retType;
     public String funcName;
 
-    public FnNode(position pos, Type retType, String funcName) {
+    public FnNode(position pos, TypeNode retType, String funcName) {
         super(pos);
         stmts = new ArrayList<>();
         argsDef = new ArrayList<>();

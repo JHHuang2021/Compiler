@@ -1,5 +1,6 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 public class unaryExprNode extends ExprNode {
@@ -15,6 +16,7 @@ public class unaryExprNode extends ExprNode {
         super(pos);
         this.expr = expr;
         this.opCode = opCode;
+        this.type = new TypeNode(pos, new Type("int"));
     }
 
     @Override

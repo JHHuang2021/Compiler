@@ -5,10 +5,9 @@ import Util.position;
 public class constExprNode<T> extends ExprNode {
     public T value;
 
-    public constExprNode(T value, TypeNode constType, position pos) {
+    public constExprNode(T value, position pos) {
         super(pos);
         this.value = value;
-        type = constType;
     }
 
     @Override

@@ -10,7 +10,7 @@ public class funcCallExprNode extends ExprNode {
     public funcCallExprNode(position pos, String name) {
         super(pos);
         this.name = name;
-        args = new ArrayList<>();
+        this.args = new ArrayList<>();
     }
 
     @Override

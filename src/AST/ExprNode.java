@@ -1,11 +1,11 @@
 package AST;
 
-import MIR.entity;
+// import MIR.entity;
 import Util.position;
 
 public abstract class ExprNode extends ASTNode {
     public TypeNode type;
-    public entity val;
+    // public entity val;
 
     public ExprNode(position pos) {
         super(pos);

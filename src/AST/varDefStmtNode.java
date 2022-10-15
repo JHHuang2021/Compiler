@@ -7,9 +7,9 @@ import Util.position;
 public class varDefStmtNode extends StmtNode {
     public static class Var {
         // Type type;
-        TypeNode type;
-        String name;
-        ExprNode init;
+        public TypeNode type;
+        public String name;
+        public ExprNode init;
 
         public Var(TypeNode type, String name, ExprNode init) {
             this.type = type;
@@ -18,7 +18,7 @@ public class varDefStmtNode extends StmtNode {
         }
     };
 
-    ArrayList<Var> var;
+    public ArrayList<Var> var;
 
     public varDefStmtNode(position pos, ArrayList<Var> var) {
         super(pos);
