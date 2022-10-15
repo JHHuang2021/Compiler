@@ -5,8 +5,6 @@ import Util.error.semanticError;
 
 import java.util.HashMap;
 
-import org.antlr.v4.codegen.model.PlusBlock;
-
 public class Scope {
 
     private HashMap<String, Type> members;
@@ -38,17 +36,17 @@ public class Scope {
             return false;
     }
 
-    public void defineVariable(String name, Type t, position pos) {
+    public void define(String name, Type t, position pos) {
         if (members.containsKey(name))
-            throw new semanticError("Semantic Error: variable redefine", pos);
+            throw new semanticError("Semantic Error: redefine", pos);
         members.put(name, t);
     }
 
-    public boolean containsVariable(String name, boolean lookUpon) {
+    public boolean contains(String name, boolean lookUpon) {
         if (members.containsKey(name))
             return true;
         else if (parentScope != null && lookUpon)
-            return parentScope.containsVariable(name, true);
+            return parentScope.contains(name, true);
         else
             return false;
     }
@@ -61,11 +59,11 @@ public class Scope {
         return null;
     }
 
-    public register getEntity(String name, boolean lookUpon) {
-        if (entities.containsKey(name))
-            return entities.get(name);
-        else if (parentScope != null && lookUpon)
-            return parentScope.getEntity(name, true);
-        return null;
-    }
+    // public register getEntity(String name, boolean lookUpon) {
+    //     if (entities.containsKey(name))
+    //         return entities.get(name);
+    //     else if (parentScope != null && lookUpon)
+    //         return parentScope.getEntity(name, true);
+    //     return null;
+    // }
 }

@@ -11,7 +11,7 @@ import Util.Scope.ScopeType;
 public class SemanticChecker implements ASTVisitor {
     private Scope currentScope;
     private globalScope gScope;
-    private Type currentStruct = null;
+    private Type currentClass = null;
     private ScopeType nxtScopeType = null;
 
     public SemanticChecker(globalScope gScope) {
@@ -28,14 +28,19 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(classDefNode it) {
-        currentStruct = gScope.getTypeFromName(it.name, it.pos);
+        currentClass = gScope.getTypeFromName(it.name, it.pos);
         it.varDefs.forEach(vd -> vd.accept(this));
         it.funcDefs.forEach(fd -> fd.accept(this));
-        currentStruct = null;
+        currentClass = null;
     }
 
     @Override
     public void visit(FnNode it) {
+        if (currentScope != gScope)
+            throw new semanticError("wrong position of function definition", it.pos);
+        if (currentScope.contains(it.funcName, true))
+            throw new semanticError("redefinition of function " + it.funcName, it.pos);
+        currentScope.define(it.funcName, it.retType.GetType(), it.pos);
         nxtScopeType = ScopeType.FUNC;
         currentScope = new Scope(currentScope);
         for (varDefStmtNode node : it.argsDef)
@@ -48,12 +53,12 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(varDefStmtNode it) {
-        if (currentStruct != null) {
-            assert (currentStruct.members != null);
+        if (currentClass != null) {
+            assert (currentClass.members != null);
             for (Var var : it.var) {
-                if (currentStruct.members.containsKey(var.name))
+                if (currentClass.members.containsKey(var.name))
                     throw new semanticError("redefinition of member " + var.name, it.pos);
-                currentStruct.members.put(var.name, gScope.getTypeFromName(var.type.ToString(),
+                currentClass.members.put(var.name, gScope.getTypeFromName(var.type.ToString(),
                         it.pos));
                 // if (var.init != null)
                 // throw new semanticError("Yx does not support default init of members",
@@ -68,7 +73,7 @@ public class SemanticChecker implements ASTVisitor {
                 throw new semanticError("Semantic Error: type not match.",
                         var.init.pos);
             // }
-            currentScope.defineVariable(var.name, gScope.getTypeFromName(var.type.ToString(),
+            currentScope.define(var.name, gScope.getTypeFromName(var.type.ToString(),
                     it.pos), it.pos);
         }
     }
@@ -150,7 +155,7 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(varExprNode it) {
-        if (!currentScope.containsVariable(it.name, true))
+        if (!currentScope.contains(it.name, true))
             throw new semanticError("Semantic Error: variable not defined. ", it.pos);
         it.type = new TypeNode(it.pos, currentScope.getType(it.name, true));
     }
@@ -215,12 +220,14 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(funcCallExprNode it) {
-
+        if (!currentScope.contains(it.name, true))
+            throw new semanticError("Semantic Error: variable not defined. ", it.pos);
+        it.type = new TypeNode(it.pos, currentScope.getType(it.name, true));
     }
 
     @Override
     public void visit(thisExprNode it) {
-        
+
     }
 
     @Override
