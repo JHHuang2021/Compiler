@@ -181,11 +181,16 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(breakStmtNode it) {
+        if (currentScope == null || (!currentScope.containScopeType(ScopeType.FOR, true)
+                && !currentScope.containScopeType(ScopeType.WHILE, true)))
+            throw new semanticError("Semantic Error: break doesn't exist in loop.", it.pos);
     }
 
     @Override
     public void visit(continueStmtNode it) {
-
+        if (currentScope == null || (!currentScope.containScopeType(ScopeType.FOR, true)
+                && !currentScope.containScopeType(ScopeType.WHILE, true)))
+            throw new semanticError("Semantic Error: break doesn't exist in loop.", it.pos);
     }
 
     @Override
@@ -195,7 +200,9 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(unaryExprNode it) {
-
+        if (it.type.ToString() != "int")
+            throw new semanticError("Semantic Error: type not match. It should be int",
+                    it.pos);
     }
 
     @Override
@@ -218,6 +225,6 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(TypeNode typeNode) {
-
+        
     }
 }
