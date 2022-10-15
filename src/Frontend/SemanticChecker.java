@@ -220,11 +220,11 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(thisExprNode it) {
-
+        
     }
 
     @Override
     public void visit(TypeNode typeNode) {
-        
+
     }
 }
