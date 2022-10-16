@@ -17,6 +17,7 @@ import AST.binaryExprNode.binaryOpType;
 import AST.logicExprNode.logicOpType;
 import AST.unaryExprNode.unaryOpType;
 import AST.varDefStmtNode.Var;
+import AST.varExprNode.Layer;
 
 public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     private globalScope gScope;
@@ -41,7 +42,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
         int varNum = ctx.Identifier().size();
         TypeNode type = (TypeNode) visit(ctx.type());
         for (int i = 0; i < varNum; i++) {
-            String name = ctx.Identifier(i).toString();
+            String name = ctx.Identifier(i).getText();
             ExprNode expr = null;
             if (ctx.expression(i) != null)
                 expr = (ExprNode) visit(ctx.expression(i));
@@ -53,7 +54,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitClassDef(MxParser.ClassDefContext ctx) {
-        classDefNode classDef = new classDefNode(new position(ctx), ctx.Identifier().toString());
+        classDefNode classDef = new classDefNode(new position(ctx), ctx.Identifier().getText());
         ctx.varDef().forEach(vd -> classDef.varDefs.add((varDefStmtNode) visit(vd)));
         return classDef;
     }
@@ -210,21 +211,24 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitPrimary(MxParser.PrimaryContext ctx) {
-        if (ctx.Identifier() != null) {
-            if (ctx.expression().isEmpty())
-                return new varExprNode(ctx.Identifier().toString(), new position(ctx.Identifier()));
-            else {
-                int dim = ctx.expression().size();
-                ArrayList<ExprNode> dimArgs = new ArrayList<>();
-                for (int i = 0; i < dim; i++)
-                    dimArgs.add((ExprNode) visit(ctx.expression(i)));
-                return new varExprNode(ctx.Identifier().toString(), dim, dimArgs, new position(ctx.Identifier()));
-            }
+        if (ctx.name() != null) {
+            ArrayList<Layer> var = new ArrayList<>();
+            ctx.name().varible().forEach(v -> {
+                Layer layer = new Layer(v.Identifier().getText());
+                int dim = v.expression().size();
+                if (dim > 0) {
+                    layer.dim = dim;
+                    layer.dimArgs = new ArrayList<>();
+                    for (int i = 0; i < dim; i++)
+                        layer.dimArgs.add((ExprNode) visit(v.expression(i)));
+
+                }
+                var.add(layer);
+            });
+            return new varExprNode(new position(ctx), var);
         }
         if (ctx.This() != null)
             return new varExprNode(new position(ctx));
-        if (ctx.expression(0) != null)
-            return visit(ctx.expression(0));
         if (ctx.literal() != null)
             return visit(ctx.literal());
         return null;
@@ -247,11 +251,10 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitFuncCall(MxParser.FuncCallContext ctx) {
-        funcCallExprNode node = new funcCallExprNode(new position(ctx), ctx.Identifier().toString());
-        if (ctx.classPref() != null) {
-        } else
-            for (int i = 0; i < ctx.arg().expression().size(); i++)
-                node.args.add((ExprNode) visit(ctx.arg().expression(i)));
+        funcCallExprNode node = new funcCallExprNode(new position(ctx), ctx.name().getText());
+        // Todo
+        for (int i = 0; i < ctx.arg().expression().size(); i++)
+            node.args.add((ExprNode) visit(ctx.arg().expression(i)));
 
         return node;
     }
@@ -261,12 +264,12 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
         TypeNode type = null;
         if (ctx.type() != null)
             type = (TypeNode) visit(ctx.type());
-        FnNode node = new FnNode(new position(ctx), type, ctx.Identifier().toString());
+        FnNode node = new FnNode(new position(ctx), type, ctx.Identifier().getText());
         for (int i = 0; i < ctx.suite().statement().size(); i++)
             node.stmts.add((StmtNode) visit(ctx.suite().statement(i)));
         for (int i = 0; i < ctx.argDef().Identifier().size(); i++) {
             ArrayList<Var> var = new ArrayList<>();
-            var.add(new Var((TypeNode) visit(ctx.argDef().type(i)), ctx.argDef().Identifier(i).toString(), null));
+            var.add(new Var((TypeNode) visit(ctx.argDef().type(i)), ctx.argDef().Identifier(i).getText(), null));
             node.argsDef.add(new varDefStmtNode(new position(ctx), var));
         }
         return node;
@@ -275,15 +278,15 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitLiteral(MxParser.LiteralContext ctx) {
         if (ctx.DecimalInteger() != null)
-            return new constExprNode<Integer>(Integer.parseInt(ctx.DecimalInteger().toString()), new position(ctx));
+            return new constExprNode<Integer>(Integer.parseInt(ctx.DecimalInteger().getText()), new position(ctx));
         else if (ctx.BoolConstant() != null) {
-            String boolConstant = ctx.BoolConstant().toString();
+            String boolConstant = ctx.BoolConstant().getText();
             boolean value = false;
             if (boolConstant == "true")
                 value = true;
             return new constExprNode<Boolean>(value, new position(ctx));
         } else if (ctx.StringConstant() != null) {
-            return new constExprNode<String>(ctx.StringConstant().toString(), new position(ctx));
+            return new constExprNode<String>(ctx.StringConstant().getText(), new position(ctx));
         } else
             return new constExprNode<NullType>(null, new position(ctx));
     }
@@ -305,9 +308,9 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     public ASTNode visitTypewitharg(MxParser.TypewithargContext ctx) {
         Type type = new Type();
         if (ctx.basicType() != null) {
-            type.typeName = ctx.basicType().toString();
+            type.typeName = ctx.basicType().getText();
         } else {
-            type.typeName = ctx.arraywitharg().toString();
+            type.typeName = ctx.arraywitharg().getText();
             type.array = true;
             type.dim = ctx.arraywitharg().Int().size();
             for (int i = 0; i < type.dim; i++)

@@ -5,26 +5,39 @@ import java.util.ArrayList;
 import Util.position;
 
 public class varExprNode extends ExprNode {
-    public boolean ifthis = false;
-    public String name;
-    public int dim = 0;
-    public ArrayList<ExprNode> dimArgs = null;
+
+    public static class Layer {
+        public boolean ifthis = false;
+        public String name;
+        public int dim = 0;
+        public ArrayList<ExprNode> dimArgs = null;
+
+        public  Layer() {
+            this.ifthis = true;
+        }
+
+        public Layer(String name) {
+            this.name = name;
+        }
+
+        public Layer(String name, int dim, ArrayList<ExprNode> dimArgs) {
+            this.name = name;
+            this.dim = dim;
+            this.dimArgs = dimArgs;
+        }
+    }
+
+    public ArrayList<Layer> var = null;
 
     public varExprNode(position pos) {
         super(pos);
-        this.ifthis = true;
+        var = new ArrayList<>();
+        var.add(new Layer());
     }
 
-    public varExprNode(String name, position pos) {
+    public varExprNode(position pos, ArrayList<Layer> var) {
         super(pos);
-        this.name = name;
-    }
-
-    public varExprNode(String name, int dim, ArrayList<ExprNode> dimArgs, position pos) {
-        super(pos);
-        this.name = name;
-        this.dim = dim;
-        this.dimArgs = dimArgs;
+        this.var = var;
     }
 
     @Override

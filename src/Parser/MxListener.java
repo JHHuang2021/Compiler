@@ -324,16 +324,6 @@ public interface MxListener extends ParseTreeListener {
 	 */
 	void exitLambdaExpression(MxParser.LambdaExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MxParser#classPref}.
-	 * @param ctx the parse tree
-	 */
-	void enterClassPref(MxParser.ClassPrefContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#classPref}.
-	 * @param ctx the parse tree
-	 */
-	void exitClassPref(MxParser.ClassPrefContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MxParser#funcCall}.
 	 * @param ctx the parse tree
 	 */
@@ -353,6 +343,26 @@ public interface MxListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFuncDef(MxParser.FuncDefContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MxParser#varible}.
+	 * @param ctx the parse tree
+	 */
+	void enterVarible(MxParser.VaribleContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#varible}.
+	 * @param ctx the parse tree
+	 */
+	void exitVarible(MxParser.VaribleContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MxParser#name}.
+	 * @param ctx the parse tree
+	 */
+	void enterName(MxParser.NameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#name}.
+	 * @param ctx the parse tree
+	 */
+	void exitName(MxParser.NameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxParser#literal}.
 	 * @param ctx the parse tree

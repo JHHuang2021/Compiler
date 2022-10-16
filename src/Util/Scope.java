@@ -1,6 +1,6 @@
 package Util;
 
-import MIR.register;
+// import MIR.register;
 import Util.error.semanticError;
 
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class Scope {
 
     private HashMap<String, Type> members;
-    public HashMap<String, register> entities = new HashMap<>();
+    // public HashMap<String, register> entities = new HashMap<>();
     public Type returnType = null;
     private Scope parentScope;
 
@@ -21,6 +21,12 @@ public class Scope {
     public Scope(Scope parentScope) {
         members = new HashMap<>();
         this.parentScope = parentScope;
+    }
+
+    public Scope(Scope parentScope, ScopeType scopeType) {
+        members = new HashMap<>();
+        this.parentScope = parentScope;
+        this.scopeType = scopeType;
     }
 
     public Scope parentScope() {
@@ -60,10 +66,10 @@ public class Scope {
     }
 
     // public register getEntity(String name, boolean lookUpon) {
-    //     if (entities.containsKey(name))
-    //         return entities.get(name);
-    //     else if (parentScope != null && lookUpon)
-    //         return parentScope.getEntity(name, true);
-    //     return null;
+    // if (entities.containsKey(name))
+    // return entities.get(name);
+    // else if (parentScope != null && lookUpon)
+    // return parentScope.getEntity(name, true);
+    // return null;
     // }
 }

@@ -13,11 +13,18 @@ public class Type {
     public ArrayList<ExprNode> dimArgs;
     public HashMap<String, Type> members = null;
 
-
     public Type() {
     }
 
     public Type(String typeName) {
         this.typeName = typeName;
     }
+
+    public Type containsVarible(String v) {
+        if (members != null && members.containsKey(v))
+            return members.get(v);
+        else
+            return null;
+    }
+
 }

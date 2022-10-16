@@ -1,7 +1,10 @@
 package Frontend;
 
+import java.util.HashMap;
+
 import AST.*;
 import AST.varDefStmtNode.Var;
+import Util.Func;
 import Util.Scope;
 import Util.Type;
 import Util.error.semanticError;
@@ -28,6 +31,7 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(classDefNode it) {
+        // gScope.addType(it.name, new Type(it.name), it.pos);
         currentClass = gScope.getTypeFromName(it.name, it.pos);
         it.varDefs.forEach(vd -> vd.accept(this));
         it.funcDefs.forEach(fd -> fd.accept(this));
@@ -40,21 +44,23 @@ public class SemanticChecker implements ASTVisitor {
             throw new semanticError("wrong position of function definition", it.pos);
         if (currentScope.contains(it.funcName, true))
             throw new semanticError("redefinition of function " + it.funcName, it.pos);
-        currentScope.define(it.funcName, it.retType.GetType(), it.pos);
+        gScope.defineFunc(it.funcName, it.retType.GetType(), it.argsDef, it.pos);
         nxtScopeType = ScopeType.FUNC;
-        currentScope = new Scope(currentScope);
+        currentScope = new Scope(currentScope, ScopeType.FUNC);
+        currentScope.returnType = it.retType.GetType();
         for (varDefStmtNode node : it.argsDef)
             node.accept(this);
         for (StmtNode stmt : it.stmts)
             stmt.accept(this);
-        currentScope.returnType = it.retType.GetType();
         nxtScopeType = null;
+        currentScope = gScope;
     }
 
     @Override
     public void visit(varDefStmtNode it) {
         if (currentClass != null) {
-            assert (currentClass.members != null);
+            if (currentClass.members == null)
+                currentClass.members = new HashMap<>();
             for (Var var : it.var) {
                 if (currentClass.members.containsKey(var.name))
                     throw new semanticError("redefinition of member " + var.name, it.pos);
@@ -64,12 +70,14 @@ public class SemanticChecker implements ASTVisitor {
                 // throw new semanticError("Yx does not support default init of members",
                 // var.init.pos);
             }
+            return;
         }
 
         // if (it.init != null) {
         for (Var var : it.var) {
-            var.init.accept(this);
-            if (var.init != null && var.init.type != var.type)
+            if (var.init != null)
+                var.init.accept(this);
+            if (var.init != null && !var.init.type.Equal(var.type))
                 throw new semanticError("Semantic Error: type not match.",
                         var.init.pos);
             // }
@@ -84,7 +92,7 @@ public class SemanticChecker implements ASTVisitor {
             throw new semanticError("Semantic Error: return doesn't exist in function.", it.pos);
         if (it.value != null) {
             it.value.accept(this);
-            if (it.value.type.GetType() != currentScope.returnType)
+            if (it.value.type.Equal(currentScope.returnType))
                 throw new semanticError("Semantic Error: type not match.",
                         it.value.pos);
         } else if (currentScope.returnType.typeName != "void")
@@ -96,7 +104,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(suiteStmtNode it) {
         currentScope.scopeType = nxtScopeType;
         if (!it.stmts.isEmpty()) {
-            currentScope = new Scope(currentScope);
+            currentScope = new Scope(currentScope, nxtScopeType);
             for (StmtNode stmt : it.stmts)
                 stmt.accept(this);
             currentScope = currentScope.parentScope();
@@ -125,7 +133,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(assignExprNode it) {
         it.rhs.accept(this);
         it.lhs.accept(this);
-        if (it.rhs.type != it.lhs.type)
+        if (!it.rhs.type.Equal(it.lhs.type))
             throw new semanticError("Semantic Error: type not match. ", it.pos);
         if (!it.lhs.isAssignable())
             throw new semanticError("Semantic Error: not assignable", it.lhs.pos);
@@ -136,13 +144,26 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(binaryExprNode it) {
         it.lhs.accept(this);
         it.rhs.accept(this);
-        if (it.lhs.type != it.rhs.type)
+        if (!it.rhs.type.Equal(it.lhs.type))
             throw new semanticError("Semantic error: type not match. It should be int",
                     it.lhs.pos);
     }
 
     @Override
     public <T> void visit(constExprNode<T> it) {
+        String typeName = null;
+        switch (it.value.getClass().getName()) {
+            case "java.lang.String":
+                typeName = "string";
+                break;
+            case "java.lang.Integer":
+                typeName = "int";
+                break;
+            case "java.lang.Boolean":
+                typeName = "bool";
+                break;
+        }
+        it.type = new TypeNode(it.pos, new Type(typeName));
     }
 
     // @Override
@@ -155,9 +176,16 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(varExprNode it) {
-        if (!currentScope.contains(it.name, true))
+        if (!currentScope.contains(it.var.get(0).name, true))
             throw new semanticError("Semantic Error: variable not defined. ", it.pos);
-        it.type = new TypeNode(it.pos, currentScope.getType(it.name, true));
+        currentClass = currentScope.getType(it.var.get(0).name, true);
+        for (int i = 1; i < it.var.size(); i++) {
+            currentClass = currentClass.containsVarible(it.var.get(i).name);
+            if (currentClass == null)
+                throw new semanticError("Semantic Error: variable not defined", it.pos);
+        }
+        it.type = new TypeNode(it.pos, currentClass);
+        currentClass = null;
     }
 
     @Override
@@ -200,7 +228,6 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(newExprNode it) {
-
     }
 
     @Override
@@ -220,8 +247,15 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(funcCallExprNode it) {
-        if (!currentScope.contains(it.name, true))
-            throw new semanticError("Semantic Error: variable not defined. ", it.pos);
+        Func calledFunc = gScope.containFunc(it.name, it.pos);
+        if (it.args.size() != calledFunc.args.size())
+            throw new semanticError("Semantic Error: function " + it.name + " requires " + calledFunc.args.size()
+                    + " but has " + it.args.size(), it.pos);
+        for (int i = 0; i < it.args.size(); i++) {
+            it.args.get(i).accept(this);
+            if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type))
+                throw new semanticError("Semantic Error: type not match", it.pos);
+        }
         it.type = new TypeNode(it.pos, currentScope.getType(it.name, true));
     }
 

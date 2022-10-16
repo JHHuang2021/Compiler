@@ -42,20 +42,17 @@ expression:
 	| funcCall																# functionCallExpr
 	| lambdaExpression														# lambda;
 
-primary:
-	literal
-	| This
-	| '(' expression ')'
-	| Identifier ('[' expression ']')*;
+primary: literal | This | '(' expression ')' | name;
 
 argDef: (type Identifier)? (',' type Identifier)*;
 arg: expression? ( ',' expression)*;
 lambdaExpression:
 	'[' '&'? ']' ('(' argDef ')')? '->' suite '(' arg ')';
-classPref: ((Identifier ('[' expression ']')*) '.')*;
-funcCall: classPref Identifier '(' arg ')';
+funcCall: name '(' arg ')';
 funcDef: type? Identifier '(' argDef ')' suite;
 
+varible: Identifier ('[' expression ']')*;
+name: ( varible '.')* varible;
 literal:
 	DecimalInteger
 	| BoolConstant

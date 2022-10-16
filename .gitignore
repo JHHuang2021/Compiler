@@ -3,5 +3,6 @@
 /.vscode
 /lib
 /src/Parser/.antlr
-c.g4
 test.mx
+test.out
+result.out

@@ -19,6 +19,20 @@ public class TypeNode extends ASTNode {
         return type;
     }
 
+    public boolean Equal(TypeNode rhs) {
+        if (this.type.typeName.equals(rhs.type.typeName) && this.type.dim == rhs.type.dim)
+            return true;
+        else
+            return false;
+    }
+
+    public boolean Equal(Type rhs) {
+        if (this.type.typeName == rhs.typeName && this.type.dim == rhs.dim)
+            return true;
+        else
+            return false;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
