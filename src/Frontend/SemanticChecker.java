@@ -157,7 +157,7 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(returnStmtNode it) {
         Type retType = currentScope.returnType();
-        if (currentScope == null || retType == null)
+        if (currentScope == gScope || retType == null)
             throw new semanticError("return doesn't exist in function.", it.pos);
         if (it.ifthis) {
             if (currentScope == gScope || currentClass == null)
@@ -177,7 +177,8 @@ public class SemanticChecker implements ASTVisitor {
         if (!it.stmts.isEmpty()) {
             currentScope = new Scope(currentScope, nxtScopeType);
             for (StmtNode stmt : it.stmts)
-                stmt.accept(this);
+                if (stmt != null)
+                    stmt.accept(this);
             currentScope = currentScope.parentScope();
         }
     }
@@ -381,6 +382,13 @@ public class SemanticChecker implements ASTVisitor {
             currentClass = gScope.containType(currentClassName, it.pos);
         else
             currentClass = null;
+    }
+
+    @Override
+    public void visit(exprArrayNode it) {
+        for (int i = 0; i < it.expr.size(); i++)
+            it.expr.get(i).accept(this);
+        it.type = new TypeNode(it.pos, it.expr.get(0).type.GetType(), it.expr.size() - 1);
     }
 
 }

@@ -433,13 +433,13 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
         return visitChildren(ctx);
     }
 
-    // @Override
-    // public ASTNode visitExprArray(MxParser.ExprArrayContext ctx) {
-    // visitExprNode node = new visitExprNode(new position(ctx), (ExprNode)
-    // visit(ctx.expression(0)),
-    // (ExprNode) visit(ctx.expression(1)));
-    // return node;
-    // }
+    @Override
+    public ASTNode visitExprArray(MxParser.ExprArrayContext ctx) {
+        exprArrayNode node = new exprArrayNode(new position(ctx));
+        for (int i = 0; i < ctx.expression().size(); i++)
+            node.expr.add((ExprNode) visit(ctx.expression(i)));
+        return node;
+    }
 
     @Override
     public ASTNode visitVisitExpr(MxParser.VisitExprContext ctx) {

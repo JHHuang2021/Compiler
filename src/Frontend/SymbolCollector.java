@@ -150,4 +150,9 @@ public class SymbolCollector implements ASTVisitor {
     public void visit(visitExprNode it) {
 
     }
+
+	@Override
+	public void visit(exprArrayNode it) {
+		
+	}
 }

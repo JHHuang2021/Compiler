@@ -90,7 +90,6 @@ LeftBracket: '[';
 RightBracket: ']';
 LeftBrace: '{';
 RightBrace: '}';
-Dim: '[]';
 
 Less: '<';
 LessEqual: '<=';

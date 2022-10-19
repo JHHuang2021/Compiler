@@ -43,7 +43,7 @@ public class Scope {
     }
 
     public Type returnType() {
-        if (this.scopeType == ScopeType.FUNC)
+        if (this.returnType != null)
             return this.returnType;
         else if (parentScope != null)
             return parentScope.returnType();
