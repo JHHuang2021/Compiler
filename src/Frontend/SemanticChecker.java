@@ -259,7 +259,7 @@ public class SemanticChecker implements ASTVisitor {
         // currentClass = currentScope.getType(it.var.get(0).name, true);
         if (varType == null && currentClass != null)
             varType = currentClass.containVarible(it.name);
-        else if (currentScope.containVarible(it.name, true))
+        if (varType == null && currentScope.containVarible(it.name, true))
             varType = currentScope.getVaribleType(it.name, true);
 
         if (varType == null)
