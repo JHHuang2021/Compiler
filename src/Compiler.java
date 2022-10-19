@@ -9,7 +9,9 @@ import Util.MxErrorListener;
 import Util.globalScope;
 import Util.error.error;
 
-import java.util.Scanner;
+// import java.io.FileInputStream;
+import java.io.InputStream;
+// import java.util.Scanner;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,17 +24,14 @@ public class Compiler {
     public static void main(String[] args) throws Exception {
         // String name = "test.mx";
         // InputStream input = new FileInputStream(name);
-        String s = "";
-        Scanner in = new Scanner(System.in);
-        while (in.hasNextLine())
-            s += in.nextLine();
-        in.close();
+
+        InputStream input = System.in;
 
         try {
             RootNode ASTRoot;
             globalScope gScope = new globalScope(null);
 
-            MxLexer lexer = new MxLexer(CharStreams.fromString(s));
+            MxLexer lexer = new MxLexer(CharStreams.fromStream(input));
             lexer.removeErrorListeners();
             lexer.addErrorListener(new MxErrorListener());
             MxParser parser = new MxParser(new CommonTokenStream(lexer));
