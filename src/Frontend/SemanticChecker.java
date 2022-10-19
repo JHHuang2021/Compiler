@@ -90,7 +90,8 @@ public class SemanticChecker implements ASTVisitor {
         for (varDefStmtNode node : it.argsDef)
             node.accept(this);
         for (StmtNode stmt : it.stmts)
-            stmt.accept(this);
+            if (stmt != null)
+                stmt.accept(this);
         nxtScopeType = null;
         currentScope = gScope;
     }
