@@ -9,8 +9,6 @@ import Util.MxErrorListener;
 import Util.globalScope;
 import Util.error.error;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Scanner;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -28,6 +26,7 @@ public class Compiler {
         Scanner in = new Scanner(System.in);
         while (in.hasNextLine())
             s += in.nextLine();
+        in.close();
 
         try {
             RootNode ASTRoot;
