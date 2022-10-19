@@ -20,6 +20,7 @@ public class SemanticChecker implements ASTVisitor {
     private ScopeType nxtScopeType = null;
     private CheckName check = new CheckName();
     private boolean ifthis = false;
+    private boolean ifinclass = false;
 
     public SemanticChecker(globalScope gScope) {
         currentScope = this.gScope = gScope;
@@ -259,12 +260,17 @@ public class SemanticChecker implements ASTVisitor {
         // throw new semanticError("variable not defined. ", it.pos);
         // currentClass = currentScope.getType(it.var.get(0).name, true);
         if (!ifthis) {
-            if (varType == null && currentScope.containVarible(it.name, false))
-                varType = currentScope.getVaribleType(it.name, false);
-            if (varType == null && currentClass != null)
-                varType = currentClass.containVarible(it.name);
-            if (varType == null && currentScope.containVarible(it.name, true))
-                varType = currentScope.getVaribleType(it.name, true);
+            if (!ifinclass) {
+                if (varType == null && currentScope.containVarible(it.name, false))
+                    varType = currentScope.getVaribleType(it.name, false);
+                if (varType == null && currentClass != null)
+                    varType = currentClass.containVarible(it.name);
+                if (varType == null && currentScope.containVarible(it.name, true))
+                    varType = currentScope.getVaribleType(it.name, true);
+            } else {
+                if (varType == null && currentClass != null)
+                    varType = currentClass.containVarible(it.name);
+            }
         } else {
             ifthis = false;
             if (varType == null && currentClass != null)
@@ -326,9 +332,12 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(unaryExprNode it) {
+        it.expr.accept(this);
         if (!it.type.GetType().typeName.equals("int"))
             throw new semanticError("type not match. It should be int",
                     it.pos);
+        if (!it.expr.isAssignable())
+            throw new semanticError("left value operation is invalid", it.pos);
     }
 
     @Override
@@ -347,8 +356,10 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(funcCallExprNode it) {
         Func calledFunc = null;
-        if (currentClass != null && ifthis) {
-            ifthis = false;
+
+        if (currentClass != null && (ifthis || ifinclass)) {
+            if (ifthis)
+                ifthis = false;
             calledFunc = currentClass.containFunc(it.name, it.pos);
             if (calledFunc == null)
                 throw new semanticError("function " + it.name + " not exists", it.pos);
@@ -408,6 +419,7 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(visitExprNode it) {
         it.visitor.accept(this);
+        ifinclass = true;
         String currentClassName = null;
         if (currentClass != null)
             currentClassName = currentClass.typeName;
@@ -416,6 +428,7 @@ public class SemanticChecker implements ASTVisitor {
             ifthis = true;
         it.visitee.accept(this);
         ifthis = false;
+        ifinclass = false;
         it.type = it.visitee.type;
         if (currentClassName != null)
             currentClass = gScope.containType(currentClassName, it.pos);

@@ -23,4 +23,12 @@ public class unaryExprNode extends ExprNode {
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public boolean isAssignable() {
+        if (opCode == unaryOpType.laddadd || opCode == unaryOpType.lsubsub)
+            return expr.isAssignable();
+        else
+            return false;
+    }
 }
