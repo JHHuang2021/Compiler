@@ -19,7 +19,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import AST.RootNode;
 import Frontend.*;
 
-public class Main {
+public class Compiler {
     public static void main(String[] args) throws Exception {
         String name = "test.mx";
         InputStream input = new FileInputStream(name);
