@@ -3,6 +3,7 @@ package Frontend;
 import java.util.HashMap;
 
 import AST.*;
+import AST.binaryExprNode.binaryOpType;
 import AST.varDefStmtNode.Var;
 import Util.CheckName;
 import Util.Func;
@@ -30,8 +31,13 @@ public class SemanticChecker implements ASTVisitor {
         // it.funcDefs.forEach(fd -> fd.accept(this));
         for (int i = 0; i < it.funcDefs.size(); i++)
             it.funcDefs.get(i).accept(this);
-
-        gScope.containFunc("main", null);
+        Func main = gScope.containFunc("main", it.pos);
+        if (main == null)
+            throw new semanticError("no main function", it.pos);
+        if (!main.retType.typeName.equals("int") || main.retType.dim > 0)
+            throw new semanticError("main function must return int value", it.pos);
+        if (main.args != null && main.args.size() > 0)
+            throw new semanticError("main function should not have parameters", null);
         // we SHOULD check struct definitions first
     }
 
@@ -117,16 +123,12 @@ public class SemanticChecker implements ASTVisitor {
             for (Var var : it.var) {
                 if (!check.Check(var.name))
                     throw new semanticError("reserved keyword as varible name", it.pos);
-                if (currentClass.members.containsKey(var.name))
-                    throw new semanticError("redefinition of member " + var.name, it.pos);
+
                 if (var.type.typeName.equals("void"))
                     throw new semanticError("void can't be varible's type", it.pos);
                 if (var.init != null)
                     var.init.accept(this);
-                Type t = gScope.containType(var.type.typeName, it.pos);
-                var.type.members = t.members;
-                var.type.funcs = t.funcs;
-                currentClass.members.put(var.name, var.type);
+
                 // if (var.init != null)
                 // throw new semanticError("Yx does not support default init of members",
                 // var.init.pos);
@@ -195,9 +197,12 @@ public class SemanticChecker implements ASTVisitor {
         if (!it.lhs.isAssignable())
             throw new semanticError("not assignable", it.lhs.pos);
         it.rhs.accept(this);
+        Type l = it.lhs.type.GetType();
         if (!it.rhs.type.Equal(it.lhs.type) && !it.rhs.type.GetType().typeName.equals("Null"))
             throw new semanticError("type not match. ", it.pos);
-
+        if (it.rhs.type.GetType().typeName.equals("Null") && (l.dim == 0
+                && (l.typeName.equals("int") || l.typeName.equals("bool") || l.typeName.equals("string"))))
+            throw new semanticError("null cannot be assigned to primitive type variable", it.pos);
         it.type = it.rhs.type;
     }
 
@@ -205,8 +210,12 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(binaryExprNode it) {
         it.lhs.accept(this);
         it.rhs.accept(this);
+        if (!it.lhs.type.GetType().typeName.equals("int")
+                && (!it.lhs.type.GetType().typeName.equals("string") || it.opCode != binaryOpType.add))
+            throw new semanticError("Operator " + it.opCode.name() + " cannot be applied to "
+                    + it.lhs.type.GetType().typeName + " objects.", it.pos);
         if (!it.rhs.type.Equal(it.lhs.type))
-            throw new semanticError("type not match. It should be int",
+            throw new semanticError("type not match.",
                     it.lhs.pos);
         it.type = it.lhs.type;
     }
@@ -248,10 +257,11 @@ public class SemanticChecker implements ASTVisitor {
         // == null))
         // throw new semanticError("variable not defined. ", it.pos);
         // currentClass = currentScope.getType(it.var.get(0).name, true);
-        if (currentScope.containVarible(it.name, true))
-            varType = currentScope.getVaribleType(it.name, true);
-        else if (varType == null && currentClass != null)
+        if (varType == null && currentClass != null)
             varType = currentClass.containVarible(it.name);
+        else if (currentScope.containVarible(it.name, true))
+            varType = currentScope.getVaribleType(it.name, true);
+
         if (varType == null)
             throw new semanticError("variable not defined. ", it.pos);
 
@@ -301,6 +311,8 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(newExprNode it) {
+        if (it.type.GetType().typeName.equals("void"))
+            throw new semanticError("new expression cannot apply to void", it.pos);
     }
 
     @Override

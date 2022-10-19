@@ -1,6 +1,7 @@
 package Frontend;
 
 import AST.*;
+import AST.varDefStmtNode.Var;
 import Util.Type;
 import Util.globalScope;
 import Util.error.semanticError;
@@ -21,7 +22,7 @@ public class SymbolCollector implements ASTVisitor {
         // it.strDefs.forEach(sd -> sd.accept(this));
         // it.classDefs.forEach(cd -> cd.accept(this));
         // for (int i = 0; i < it.varDefs.size(); i++)
-        //     it.varDefs.get(i).accept(this);
+        // it.varDefs.get(i).accept(this);
         for (int i = 0; i < it.classDefs.size(); i++)
             it.classDefs.get(i).accept(this);
         for (int i = 0; i < it.funcDefs.size(); i++)
@@ -60,7 +61,17 @@ public class SymbolCollector implements ASTVisitor {
 
     @Override
     public void visit(varDefStmtNode it) {
-
+        for (Var var : it.var) {
+            if (currentClass.members.containsKey(var.name))
+                throw new semanticError("redefinition of member " + var.name, it.pos);
+            Type t = gScope.containType(var.type.typeName, it.pos);
+            if (t != null) {
+                var.type.members = t.members;
+                var.type.funcs = t.funcs;
+                currentClass.members.put(var.name, var.type);
+            } else
+                currentClass.members.put(var.name, new Type(var.type.typeName));
+        }
     }
 
     @Override
@@ -151,8 +162,8 @@ public class SymbolCollector implements ASTVisitor {
 
     }
 
-	@Override
-	public void visit(exprArrayNode it) {
-		
-	}
+    @Override
+    public void visit(exprArrayNode it) {
+
+    }
 }

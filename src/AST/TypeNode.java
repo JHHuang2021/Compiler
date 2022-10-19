@@ -5,6 +5,7 @@ import Util.position;
 
 public class TypeNode extends ASTNode {
     Type type = null;
+    boolean assignable = false;
 
     public TypeNode(position pos, Type type) {
         super(pos);
@@ -46,5 +47,4 @@ public class TypeNode extends ASTNode {
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
     }
-
 }
