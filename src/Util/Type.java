@@ -24,7 +24,7 @@ public class Type {
     public Type(String typeName) {
         this.typeName = typeName;
         funcs = new HashMap<>();
-        funcs.put("size", new Func(new Type(0), null));
+        // funcs.put("size", new Func(new Type(0), null));
     }
 
     public Type containVarible(String v) {

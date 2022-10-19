@@ -13,4 +13,8 @@ public abstract class ExprNode extends ASTNode {
     public boolean isAssignable() {
         return false;
     }
+
+    public boolean ifThis() {
+        return false;
+    }
 }

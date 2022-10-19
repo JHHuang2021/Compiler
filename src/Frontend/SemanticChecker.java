@@ -19,6 +19,7 @@ public class SemanticChecker implements ASTVisitor {
     private Type currentClass = null;
     private ScopeType nxtScopeType = null;
     private CheckName check = new CheckName();
+    private boolean ifthis = false;
 
     public SemanticChecker(globalScope gScope) {
         currentScope = this.gScope = gScope;
@@ -257,10 +258,18 @@ public class SemanticChecker implements ASTVisitor {
         // == null))
         // throw new semanticError("variable not defined. ", it.pos);
         // currentClass = currentScope.getType(it.var.get(0).name, true);
-        if (varType == null && currentClass != null)
-            varType = currentClass.containVarible(it.name);
-        if (varType == null && currentScope.containVarible(it.name, true))
-            varType = currentScope.getVaribleType(it.name, true);
+        if (!ifthis) {
+            if (varType == null && currentScope.containVarible(it.name, false))
+                varType = currentScope.getVaribleType(it.name, false);
+            if (varType == null && currentClass != null)
+                varType = currentClass.containVarible(it.name);
+            if (varType == null && currentScope.containVarible(it.name, true))
+                varType = currentScope.getVaribleType(it.name, true);
+        } else {
+            ifthis = false;
+            if (varType == null && currentClass != null)
+                varType = currentClass.containVarible(it.name);
+        }
 
         if (varType == null)
             throw new semanticError("variable not defined. ", it.pos);
@@ -337,25 +346,39 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(funcCallExprNode it) {
-        Func calledFunc = gScope.containFunc(it.name, it.pos);
-        if (currentClass != null) {
-            if (calledFunc == null)
-                calledFunc = currentClass.containFunc(it.name, it.pos);
+        Func calledFunc = null;
+        if (currentClass != null && ifthis) {
+            ifthis = false;
+            calledFunc = currentClass.containFunc(it.name, it.pos);
             if (calledFunc == null)
                 throw new semanticError("function " + it.name + " not exists", it.pos);
-            if ((calledFunc.args == null && it.args.size() > 0)
-                    || (calledFunc.args != null && it.args.size() != calledFunc.args.size()))
-                throw new semanticError("function " + it.name + " requires " + calledFunc.args.size()
-                        + " but has " + it.args.size(), it.pos);
-            for (int i = 0; i < it.args.size(); i++) {
-                it.args.get(i).accept(this);
-                if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type))
-                    throw new semanticError("type not match", it.pos);
-            }
             it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
+            return;
+        }
+        if (currentClass != null) {
+            calledFunc = currentClass.containFunc(it.name, it.pos);
+            if (calledFunc == null)
+                calledFunc = gScope.containFunc(it.name, it.pos);
+            if (calledFunc == null && (!it.name.equals("size") || currentClass.dim == 0))
+                throw new semanticError("function " + it.name + " not exists", it.pos);
+            if (calledFunc != null && (!it.name.equals("size") || currentClass.dim == 0)) {
+                if ((calledFunc.args == null && it.args.size() > 0)
+                        || (calledFunc.args != null && it.args.size() != calledFunc.args.size()))
+                    throw new semanticError("function " + it.name + " requires " + calledFunc.args.size()
+                            + " but has " + it.args.size(), it.pos);
+                for (int i = 0; i < it.args.size(); i++) {
+                    it.args.get(i).accept(this);
+                    if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type))
+                        throw new semanticError("type not match", it.pos);
+                }
+                it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
+            } else {
+                it.type = new TypeNode(it.pos, gScope.containType("int", it.pos));
+            }
             // currentClass = null;
             return;
         }
+        calledFunc = gScope.containFunc(it.name, it.pos);
         if (calledFunc == null)
             throw new semanticError("function " + it.name + " not exists", it.pos);
         if ((calledFunc.args == null && it.args.size() > 0)
@@ -389,7 +412,10 @@ public class SemanticChecker implements ASTVisitor {
         if (currentClass != null)
             currentClassName = currentClass.typeName;
         currentClass = gScope.containType(it.visitor.type.GetType().typeName, it.pos);
+        if (it.visitor.ifThis())
+            ifthis = true;
         it.visitee.accept(this);
+        ifthis = false;
         it.type = it.visitee.type;
         if (currentClassName != null)
             currentClass = gScope.containType(currentClassName, it.pos);
