@@ -12,7 +12,7 @@ public class varExprNode extends ExprNode {
         public int dim = 0;
         public ArrayList<ExprNode> dimArgs = null;
 
-        public  Layer() {
+        public Layer() {
             this.ifthis = true;
         }
 
@@ -27,6 +27,7 @@ public class varExprNode extends ExprNode {
         }
     }
 
+    public boolean ifthis = false;
     public ArrayList<Layer> var = null;
 
     public varExprNode(position pos) {
@@ -35,9 +36,10 @@ public class varExprNode extends ExprNode {
         var.add(new Layer());
     }
 
-    public varExprNode(position pos, ArrayList<Layer> var) {
+    public varExprNode(position pos, ArrayList<Layer> var, boolean ifthis) {
         super(pos);
         this.var = var;
+        this.ifthis = ifthis;
     }
 
     @Override

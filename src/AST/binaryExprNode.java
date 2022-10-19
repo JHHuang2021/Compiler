@@ -7,7 +7,7 @@ public class binaryExprNode extends ExprNode {
     public ExprNode lhs, rhs;
 
     public enum binaryOpType {
-        add, sub, star, div, lshift, rshift, and, or, xor
+        add, sub, star, div, mod, lshift, rshift, and, or, xor
     }
 
     public binaryOpType opCode;

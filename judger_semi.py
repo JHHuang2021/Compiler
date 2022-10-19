@@ -23,7 +23,7 @@ for i, testcase in enumerate(testcases):
     input_prog = open(input_path, 'r').read()
     # if input_prog.count('Verdict: Success'):
     copy_file(input_path, 'test.mx')
-    cmd = 'java -XX:+ShowCodeDetailsInExceptionMessages @/tmp/cp_q75i02nztlhwf165oppqqhjp.argfile Main'
+    cmd = 'java -XX:+ShowCodeDetailsInExceptionMessages @/tmp/cp_q75i02nztlhwf165oppqqhjp.argfile Main '
     print("testing case:{} ({}/{})".format(testcase, i, testcase_number))
     if (os.system(cmd + "> test.out") >> 8):
         std_ret = input_prog.count('Verdict: Fail')

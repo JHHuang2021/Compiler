@@ -9,7 +9,7 @@ varDef:
 classDef: Class Identifier '{' varDef* '}' ';';
 
 suite: '{' statement* '}';
-body: (statement | suite);
+body: (suite | statement);
 forexpr1: (varDef | expression)?;
 statement:
 	suite		# block
@@ -29,33 +29,31 @@ statement:
 	| ';'											# emptyStmt;
 
 expression:
-	primary																	# atomExpr
-	| New typewitharg														# newExpr
-	| expression afterop = ('++' | '--')									# unaryExpr
-	| beforeop = ('++' | '--' | '~' | '-') expression						# unaryExpr
-	| op = '!' expression													# logicExpr
-	| expression op = ('*' | '/' | '+' | '-' | '<<' | '>>') expression		# arithExpr
-	| expression op = ('==' | '!=' | '<' | '>' | '<=' | '>=') expression	# logicExpr
-	| expression op = ('&' | '^' | '|') expression							# arithExpr
-	| expression op = ('&&' | '||') expression								# logicExpr
-	| expression '=' expression												# assignExpr
-	| funcCall																# functionCallExpr
-	| lambdaExpression														# lambda;
+	primary																		# atomExpr
+	| New typewitharg															# newExpr
+	| expression afterop = ('++' | '--')										# unaryExpr
+	| beforeop = ('++' | '--' | '~' | '-') expression							# unaryExpr
+	| op = '!' expression														# logicExpr
+	| expression '.' funcCall													# functionCallExpr
+	| expression op = ('*' | '/' | '%' | '+' | '-' | '<<' | '>>') expression	# arithExpr
+	| expression op = ('==' | '!=' | '<' | '>' | '<=' | '>=') expression		# logicExpr
+	| expression op = ('&' | '^' | '|') expression								# arithExpr
+	| expression op = ('&&' | '||') expression									# logicExpr
+	| expression '=' expression													# assignExpr
+	| funcCall																	# functionCallExpr
+	| lambdaExpression															# lambda;
 
-primary:
-	literal
-	| This
-	| '(' expression ')'
-	| Identifier ('[' expression ']')*;
+primary: literal | This | '(' expression ')' | name;
 
 argDef: (type Identifier)? (',' type Identifier)*;
 arg: expression? ( ',' expression)*;
 lambdaExpression:
 	'[' '&'? ']' ('(' argDef ')')? '->' suite '(' arg ')';
-classPref: ((Identifier ('[' expression ']')*) '.')*;
-funcCall: classPref Identifier '(' arg ')';
+funcCall: name '(' arg ')';
 funcDef: type? Identifier '(' argDef ')' suite;
 
+varible: Identifier ('[' expression ']')*;
+name: ( varible '.')* varible;
 literal:
 	DecimalInteger
 	| BoolConstant
@@ -101,6 +99,7 @@ Plus: '+';
 Minus: '-';
 Star: '*';
 Divide: '/';
+MOD: '%';
 PlusPlus: '++';
 MinusMinus: '--';
 
@@ -115,18 +114,20 @@ Tilde: '~';
 Colon: ':';
 Semi: ';';
 Comma: ',';
+dot: '.';
 
 Assign: '=';
 Equal: '==';
 NotEqual: '!=';
 
-Identifier: [a-zA-Z] [a-zA-Z_0-9]*;
+// True: 'true'; False: 'false'; Null: 'null';
 
-DecimalInteger: [1-9] [0-9]* | '0';
 BoolConstant: 'true' | 'false';
+NullConstant: 'null';
+Identifier: [a-zA-Z] [a-zA-Z_0-9]*;
+DecimalInteger: [1-9] [0-9]* | '0';
 StringConstant: '"' (ESC | .)*? '"';
 fragment ESC: '\\"' | '\\\\';
-NullConstant: 'null';
 
 Whitespace: [ \t]+ -> skip;
 

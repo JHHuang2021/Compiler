@@ -6,7 +6,6 @@ public class thisExprNode extends ExprNode {
 
     public thisExprNode(position pos) {
         super(pos);
-        //TODO Auto-generated constructor stub
     }
 
     @Override

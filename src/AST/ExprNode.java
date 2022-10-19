@@ -1,6 +1,5 @@
 package AST;
 
-// import MIR.entity;
 import Util.position;
 
 public abstract class ExprNode extends ASTNode {

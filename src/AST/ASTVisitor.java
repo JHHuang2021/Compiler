@@ -23,6 +23,8 @@ public interface ASTVisitor {
     void visit(logicExprNode it);
     void visit(varExprNode it);
     void visit(funcCallExprNode it);
+    void visit(FuncCallNode it);
     void visit(thisExprNode it);
-    void visit(TypeNode typeNode);
+    void visit(TypeNode it);
+    void visit(exprArrayExprNode it);
 }

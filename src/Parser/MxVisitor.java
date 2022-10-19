@@ -159,6 +159,13 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAtomExpr(MxParser.AtomExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code exprArray}
+	 * labeled alternative in {@link MxParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprArray(MxParser.ExprArrayContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code assignExpr}
 	 * labeled alternative in {@link MxParser#expression}.
 	 * @param ctx the parse tree
@@ -202,6 +209,12 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFuncCall(MxParser.FuncCallContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxParser#createFuncCall}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreateFuncCall(MxParser.CreateFuncCallContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#funcDef}.
 	 * @param ctx the parse tree
@@ -256,4 +269,10 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArraywitharg(MxParser.ArraywithargContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxParser#dot}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDot(MxParser.DotContext ctx);
 }

@@ -42,9 +42,18 @@ public class Scope {
             return false;
     }
 
+    public Type returnType() {
+        if (this.scopeType == ScopeType.FUNC)
+            return this.returnType;
+        else if (parentScope != null)
+            return parentScope.returnType();
+        else
+            return null;
+    }
+
     public void define(String name, Type t, position pos) {
         if (members.containsKey(name))
-            throw new semanticError("Semantic Error: redefine", pos);
+            throw new semanticError("redefine", pos);
         members.put(name, t);
     }
 

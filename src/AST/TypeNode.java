@@ -11,6 +11,15 @@ public class TypeNode extends ASTNode {
         this.type = type;
     }
 
+    public TypeNode(position pos, Type type, int dim) {
+        super(pos);
+        this.type = new Type(type.typeName);
+        this.type.dimArgs = type.dimArgs;
+        this.type.funcs = type.funcs;
+        this.type.members = type.members;
+        this.type.dim = type.dim - dim;
+    }
+
     public String ToString() {
         return type.typeName;
     }
@@ -27,7 +36,7 @@ public class TypeNode extends ASTNode {
     }
 
     public boolean Equal(Type rhs) {
-        if (this.type.typeName == rhs.typeName && this.type.dim == rhs.dim)
+        if (this.type.typeName.equals(rhs.typeName) && this.type.dim == rhs.dim)
             return true;
         else
             return false;
