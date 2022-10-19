@@ -6,7 +6,7 @@ varDef:
 	type Identifier ('=' expression)? (
 		',' Identifier ('=' expression)?
 	)* ';';
-classDef: Class Identifier '{' varDef* '}' ';';
+classDef: Class Identifier '{' (varDef | funcDef)* '}' ';';
 
 suite: '{' statement* '}';
 body: (suite | statement);
@@ -22,49 +22,53 @@ statement:
 		| suite
 	)												# forStmt
 	| While '(' expression ')' (statement | suite)	# whileStmt
-	| Return expression? ';'						# returnStmt
+	| Return (expression?) ';'						# returnStmt
 	| Break ';'										# breakStmt
 	| Continue ';'									# continueStmt
 	| expression ';'								# pureExprStmt
 	| ';'											# emptyStmt;
 
 expression:
-	primary																		# atomExpr
-	| New typewitharg															# newExpr
+	expression ('[' expression ']')+											# exprArray
+	| primary																	# atomExpr
+	| expression '.' expression													# visitExpr
+	| New (typewitharg | createFuncCall)										# newExpr
+	| funcCall																	# functionCallExpr
 	| expression afterop = ('++' | '--')										# unaryExpr
 	| beforeop = ('++' | '--' | '~' | '-') expression							# unaryExpr
 	| op = '!' expression														# logicExpr
-	| expression '.' funcCall													# functionCallExpr
 	| expression op = ('*' | '/' | '%' | '+' | '-' | '<<' | '>>') expression	# arithExpr
 	| expression op = ('==' | '!=' | '<' | '>' | '<=' | '>=') expression		# logicExpr
 	| expression op = ('&' | '^' | '|') expression								# arithExpr
 	| expression op = ('&&' | '||') expression									# logicExpr
 	| expression '=' expression													# assignExpr
-	| funcCall																	# functionCallExpr
 	| lambdaExpression															# lambda;
 
-primary: literal | This | '(' expression ')' | name;
+primary:
+	literal
+	| This
+	| '(' expression ')'
+	| Identifier ('[' expression ']')*;
 
 argDef: (type Identifier)? (',' type Identifier)*;
 arg: expression? ( ',' expression)*;
 lambdaExpression:
 	'[' '&'? ']' ('(' argDef ')')? '->' suite '(' arg ')';
-funcCall: name '(' arg ')';
+funcCall: Identifier '(' arg ')';
+createFuncCall: Identifier '(' arg ')';
 funcDef: type? Identifier '(' argDef ')' suite;
 
-varible: Identifier ('[' expression ']')*;
-name: ( varible '.')* varible;
 literal:
 	DecimalInteger
 	| BoolConstant
 	| StringConstant
 	| NullConstant;
 
-type: basicType | array;
-typewitharg: basicType | arraywitharg;
+type: array | basicType;
+typewitharg: arraywitharg | basicType;
 basicType: Int | Bool | String | Identifier;
-array: basicType '[]'+;
-arraywitharg: basicType ('[' Int ']')+;
+array: basicType ('[' ']')+;
+arraywitharg: basicType ('[' expression ']')* ('[' ']')*;
 
 Break: 'break';
 Continue: 'continue';

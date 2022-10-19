@@ -17,13 +17,17 @@ public class Type {
     public Type() {
     }
 
-    public Type(String typeName) {
-        this.typeName = typeName;
+    public Type(int i) {
+        this.typeName = "int";
     }
 
-    
+    public Type(String typeName) {
+        this.typeName = typeName;
+        funcs = new HashMap<>();
+        funcs.put("size", new Func(new Type(0), null));
+    }
 
-    public Type containsVarible(String v) {
+    public Type containVarible(String v) {
         if (members != null && members.containsKey(v))
             return members.get(v);
         else

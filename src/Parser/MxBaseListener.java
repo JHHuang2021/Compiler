@@ -1,5 +1,4 @@
 package Parser;
-
 // Generated from Mx.g4 by ANTLR 4.7.2
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -245,6 +244,18 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVisitExpr(MxParser.VisitExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVisitExpr(MxParser.VisitExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLogicExpr(MxParser.LogicExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -396,30 +407,6 @@ public class MxBaseListener implements MxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFuncDef(MxParser.FuncDefContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVarible(MxParser.VaribleContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVarible(MxParser.VaribleContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterName(MxParser.NameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitName(MxParser.NameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

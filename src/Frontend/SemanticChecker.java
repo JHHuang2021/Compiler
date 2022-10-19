@@ -25,8 +25,8 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(RootNode it) {
-        it.classDefs.forEach(cd -> cd.accept(this));
         it.varDefs.forEach(vd -> vd.accept(this));
+        it.classDefs.forEach(cd -> cd.accept(this));
         // it.funcDefs.forEach(fd -> fd.accept(this));
         for (int i = 0; i < it.funcDefs.size(); i++)
             it.funcDefs.get(i).accept(this);
@@ -42,14 +42,14 @@ public class SemanticChecker implements ASTVisitor {
             throw new semanticError("reserved keyword as class name", it.pos);
         currentClass = gScope.containType(it.name, it.pos);
         it.varDefs.forEach(vd -> {
-            currentClass = gScope.containType(it.name, it.pos);
+            // currentClass = gScope.containType(it.name, it.pos);
             vd.accept(this);
         });
         it.funcDefs.forEach(fd -> {
-            currentClass = gScope.containType(it.name, it.pos);
+            // currentClass = gScope.containType(it.name, it.pos);
             fd.accept(this);
         });
-        gScope.define(it.name, currentClass, it.pos);
+        gScope.defineVarible(it.name, currentClass, it.pos);
         currentClass = null;
     }
 
@@ -122,6 +122,9 @@ public class SemanticChecker implements ASTVisitor {
                     throw new semanticError("void can't be varible's type", it.pos);
                 if (var.init != null)
                     var.init.accept(this);
+                Type t = gScope.containType(var.type.typeName, it.pos);
+                var.type.members = t.members;
+                var.type.funcs = t.funcs;
                 currentClass.members.put(var.name, var.type);
                 // if (var.init != null)
                 // throw new semanticError("Yx does not support default init of members",
@@ -142,7 +145,12 @@ public class SemanticChecker implements ASTVisitor {
                 throw new semanticError("type not match.",
                         var.init.pos);
             // }
-            currentScope.define(var.name, var.type, it.pos);
+            Type t = gScope.containType(var.type.typeName, it.pos);
+            if (t == null)
+                throw new semanticError("type " + var.type.typeName + " not defined", it.pos);
+            var.type.members = t.members;
+            var.type.funcs = t.funcs;
+            currentScope.defineVarible(var.name, var.type, it.pos);
         }
     }
 
@@ -151,7 +159,10 @@ public class SemanticChecker implements ASTVisitor {
         Type retType = currentScope.returnType();
         if (currentScope == null || retType == null)
             throw new semanticError("return doesn't exist in function.", it.pos);
-        if (it.value != null) {
+        if (it.ifthis) {
+            if (currentScope == gScope || currentClass == null)
+                throw new semanticError("wrong position of this", it.pos);
+        } else if (it.value != null) {
             it.value.accept(this);
             if (!it.value.type.Equal(retType))
                 throw new semanticError("type not match.",
@@ -209,7 +220,7 @@ public class SemanticChecker implements ASTVisitor {
             case "java.lang.String":
                 typeName = "string";
                 break;
-            case "java.lang.Integer":
+            case "java.lang.Long":
                 typeName = "int";
                 break;
             case "java.lang.Boolean":
@@ -235,22 +246,14 @@ public class SemanticChecker implements ASTVisitor {
         // == null))
         // throw new semanticError("variable not defined. ", it.pos);
         // currentClass = currentScope.getType(it.var.get(0).name, true);
-        if (it.ifthis && (currentClass == null || currentScope == gScope))
-            throw new semanticError("wrong position of this.", it.pos);
-        if (currentScope.contains(it.var.get(0).name, true))
-            varType = currentScope.getType(it.var.get(0).name, true);
+        if (currentScope.containVarible(it.name, true))
+            varType = currentScope.getVaribleType(it.name, true);
         else if (varType == null && currentClass != null)
-            varType = currentClass.containsVarible(it.var.get(0).name);
+            varType = currentClass.containVarible(it.name);
         if (varType == null)
             throw new semanticError("variable not defined. ", it.pos);
 
-        it.type = new TypeNode(it.pos, varType, it.var.get(0).dim);
-        for (int i = 1; i < it.var.size(); i++) {
-            varType = varType.containsVarible(it.var.get(i).name);
-            if (varType == null)
-                throw new semanticError("variable not defined", it.pos);
-            it.type = new TypeNode(it.pos, varType, it.var.get(i).dim);
-        }
+        it.type = new TypeNode(it.pos, varType, it.dim);
     }
 
     @Override
@@ -355,7 +358,9 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(thisExprNode it) {
-
+        if (currentScope == gScope || currentClass == null)
+            throw new semanticError("wrong position of this", it.pos);
+        it.type = new TypeNode(it.pos, currentClass);
     }
 
     @Override
@@ -364,19 +369,18 @@ public class SemanticChecker implements ASTVisitor {
     }
 
     @Override
-    public void visit(FuncCallNode it) {
-        if (it.exprBeforeCall != null) {
-            it.exprBeforeCall.accept(this);
-            currentClass = gScope.containType(it.exprBeforeCall.type.GetType().typeName, it.pos);
-        }
-        it.funcCall.accept(this);
-        it.type = it.funcCall.type;
+    public void visit(visitExprNode it) {
+        it.visitor.accept(this);
+        String currentClassName = null;
+        if (currentClass != null)
+            currentClassName = currentClass.typeName;
+        currentClass = gScope.containType(it.visitor.type.GetType().typeName, it.pos);
+        it.visitee.accept(this);
+        it.type = it.visitee.type;
+        if (currentClassName != null)
+            currentClass = gScope.containType(currentClassName, it.pos);
+        else
+            currentClass = null;
     }
 
-    @Override
-    public void visit(exprArrayExprNode it) {
-        it.exp1.accept(this);
-        it.exp2.accept(this);
-        it.type = new TypeNode(it.pos, it.exp1.type.GetType(), 1);
-    }
 }

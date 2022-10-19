@@ -20,6 +20,8 @@ public class SymbolCollector implements ASTVisitor {
     public void visit(RootNode it) {
         // it.strDefs.forEach(sd -> sd.accept(this));
         // it.classDefs.forEach(cd -> cd.accept(this));
+        // for (int i = 0; i < it.varDefs.size(); i++)
+        //     it.varDefs.get(i).accept(this);
         for (int i = 0; i < it.classDefs.size(); i++)
             it.classDefs.get(i).accept(this);
         for (int i = 0; i < it.funcDefs.size(); i++)
@@ -145,12 +147,7 @@ public class SymbolCollector implements ASTVisitor {
     }
 
     @Override
-    public void visit(FuncCallNode it) {
-
-    }
-
-    @Override
-    public void visit(exprArrayExprNode it) {
+    public void visit(visitExprNode it) {
 
     }
 }

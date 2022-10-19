@@ -138,6 +138,13 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnaryExpr(MxParser.UnaryExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code visitExpr}
+	 * labeled alternative in {@link MxParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVisitExpr(MxParser.VisitExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code logicExpr}
 	 * labeled alternative in {@link MxParser#expression}.
 	 * @param ctx the parse tree
@@ -221,18 +228,6 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFuncDef(MxParser.FuncDefContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#varible}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVarible(MxParser.VaribleContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#name}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitName(MxParser.NameContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#literal}.
 	 * @param ctx the parse tree

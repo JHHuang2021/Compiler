@@ -51,26 +51,26 @@ public class Scope {
             return null;
     }
 
-    public void define(String name, Type t, position pos) {
+    public void defineVarible(String name, Type t, position pos) {
         if (members.containsKey(name))
             throw new semanticError("redefine", pos);
         members.put(name, t);
     }
 
-    public boolean contains(String name, boolean lookUpon) {
+    public boolean containVarible(String name, boolean lookUpon) {
         if (members.containsKey(name))
             return true;
         else if (parentScope != null && lookUpon)
-            return parentScope.contains(name, true);
+            return parentScope.containVarible(name, true);
         else
             return false;
     }
 
-    public Type getType(String name, boolean lookUpon) {
+    public Type getVaribleType(String name, boolean lookUpon) {
         if (members.containsKey(name))
             return members.get(name);
         else if (parentScope != null && lookUpon)
-            return parentScope.getType(name, true);
+            return parentScope.getVaribleType(name, true);
         return null;
     }
 
