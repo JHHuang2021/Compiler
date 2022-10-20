@@ -65,10 +65,14 @@ literal:
 	| NullConstant;
 
 type: array | basicType;
-typewitharg: arraywitharg | basicType;
+typewitharg: wrongarraywitharg | arraywitharg | basicType;
 basicType: Int | Bool | String | Identifier;
 array: basicType ('[' ']')+;
-arraywitharg: basicType ('[' expression ']')* ('[' ']')*;
+arraywitharg: basicType ('[' expression? ']')* ('[' ']')*;
+wrongarraywitharg:
+	basicType ('[' expression? ']')* ('[' ']')+ (
+		'[' expression ']'
+	)+ ('[' expression? ']')*;
 
 Break: 'break';
 Continue: 'continue';

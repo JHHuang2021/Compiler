@@ -5,6 +5,7 @@ import Parser.MxParser;
 import Util.Type;
 import Util.globalScope;
 import Util.position;
+import Util.error.semanticError;
 
 import java.util.ArrayList;
 
@@ -254,11 +255,6 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitLambdaExpression(MxParser.LambdaExpressionContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override
     public ASTNode visitFuncCall(MxParser.FuncCallContext ctx) {
         funcCallExprNode node = new funcCallExprNode(new position(ctx), ctx.Identifier().getText());
         // Todo
@@ -316,7 +312,9 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitTypewitharg(MxParser.TypewithargContext ctx) {
         Type type = new Type();
-        if (ctx.basicType() != null) {
+        if (ctx.wrongarraywitharg() != null)
+            throw new semanticError("wrong type of array", new position(ctx));
+        else if (ctx.basicType() != null) {
             type.typeName = ctx.basicType().getText();
         } else {
             type.typeName = ctx.arraywitharg().basicType().getText();
@@ -430,7 +428,24 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitLambda(MxParser.LambdaContext ctx) {
-        return visitChildren(ctx);
+        return visit(ctx.lambdaExpression());
+    }
+
+    @Override
+    public ASTNode visitLambdaExpression(MxParser.LambdaExpressionContext ctx) {
+        lambdaExprNode node = new lambdaExprNode(new position(ctx));
+        if (ctx.And() != null)
+            node.ifgScope = true;
+        node.stmts = ((suiteStmtNode) visit(ctx.suite())).stmts;
+        for (int i = 0; i < ctx.argDef().Identifier().size(); i++) {
+            ArrayList<Var> var = new ArrayList<>();
+            var.add(new Var(((TypeNode) visit(ctx.argDef().type(i))).GetType(), ctx.argDef().Identifier(i).getText(),
+                    null));
+            node.argsDef.add(new varDefStmtNode(new position(ctx), var));
+        }
+        for (int i = 0; i < ctx.arg().expression().size(); i++)
+            node.args.add((ExprNode) visit(ctx.arg().expression(i)));
+        return node;
     }
 
     @Override

@@ -438,6 +438,16 @@ public interface MxListener extends ParseTreeListener {
 	 */
 	void exitArraywitharg(MxParser.ArraywithargContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MxParser#wrongarraywitharg}.
+	 * @param ctx the parse tree
+	 */
+	void enterWrongarraywitharg(MxParser.WrongarraywithargContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#wrongarraywitharg}.
+	 * @param ctx the parse tree
+	 */
+	void exitWrongarraywitharg(MxParser.WrongarraywithargContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MxParser#dot}.
 	 * @param ctx the parse tree
 	 */

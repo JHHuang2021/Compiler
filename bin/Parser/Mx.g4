@@ -68,7 +68,7 @@ type: array | basicType;
 typewitharg: arraywitharg | basicType;
 basicType: Int | Bool | String | Identifier;
 array: basicType ('[' ']')+;
-arraywitharg: basicType ('[' expression ']')* ('[' ']')*;
+arraywitharg: basicType ('[' expression? ']')* ('[' ']')*;
 
 Break: 'break';
 Continue: 'continue';

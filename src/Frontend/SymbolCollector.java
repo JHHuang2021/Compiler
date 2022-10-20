@@ -49,8 +49,13 @@ public class SymbolCollector implements ASTVisitor {
                 currentClass.funcs = new HashMap<>();
             if (currentClass.containFunc(it.funcName, it.pos) != null)
                 throw new semanticError("redefinition of function " + it.funcName, it.pos);
-            if (it.retType == null)
+            if (it.retType == null) {
+                if (!it.funcName.equals(currentClass.typeName))
+                    throw new semanticError("The name of class constructor must be the same as the class name.",
+                            it.pos);
                 it.retType = new TypeNode(it.pos, new Type("Create"));
+            } else if (it.funcName.equals(currentClass.typeName))
+                throw new semanticError("Constructor Type Error.", it.pos);
             currentClass.defineFunc(it.funcName, it.retType.GetType(), it.argsDef, it.pos);
             return;
         }
@@ -69,8 +74,9 @@ public class SymbolCollector implements ASTVisitor {
                 var.type.members = t.members;
                 var.type.funcs = t.funcs;
                 currentClass.members.put(var.name, var.type);
-            } else
-                currentClass.members.put(var.name, new Type(var.type.typeName));
+            } else {
+                currentClass.members.put(var.name, var.type);
+            }
         }
     }
 
@@ -165,5 +171,11 @@ public class SymbolCollector implements ASTVisitor {
     @Override
     public void visit(exprArrayNode it) {
 
+    }
+
+    @Override
+    public void visit(lambdaExprNode it) {
+        // TODO Auto-generated method stub
+        
     }
 }

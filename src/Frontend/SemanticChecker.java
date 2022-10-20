@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import AST.*;
 import AST.binaryExprNode.binaryOpType;
+import AST.unaryExprNode.unaryOpType;
 import AST.varDefStmtNode.Var;
 import Util.CheckName;
 import Util.Func;
@@ -19,8 +20,8 @@ public class SemanticChecker implements ASTVisitor {
     private Type currentClass = null;
     private ScopeType nxtScopeType = null;
     private CheckName check = new CheckName();
-    private boolean ifthis = false;
     private boolean ifinclass = false;
+    private boolean ifinlambda = false;
 
     public SemanticChecker(globalScope gScope) {
         currentScope = this.gScope = gScope;
@@ -70,24 +71,24 @@ public class SemanticChecker implements ASTVisitor {
         if (it.retType.GetType().typeName == "void" && it.retType.GetType().dim > 0)
             throw new semanticError("void[] can't be return type", it.pos);
 
-        if (currentClass != null) {
-            // if (currentClass.funcs == null)
-            // currentClass.funcs = new HashMap<>();
-            // if (currentClass.containFunc(it.funcName, it.pos) != null)
-            // throw new semanticError("redefinition of function " + it.funcName, it.pos);
-            // currentClass.defineFunc(it.funcName, it.retType.GetType(), it.argsDef,
-            // it.pos);
-            nxtScopeType = ScopeType.FUNC;
-            currentScope = new Scope(currentScope, ScopeType.FUNC);
-            currentScope.returnType = it.retType.GetType();
-            for (varDefStmtNode node : it.argsDef)
-                node.accept(this);
-            for (StmtNode stmt : it.stmts)
-                stmt.accept(this);
-            nxtScopeType = null;
-            currentScope = gScope;
-            return;
-        }
+        // if (currentClass != null) {
+        // if (currentClass.funcs == null)
+        // currentClass.funcs = new HashMap<>();
+        // if (currentClass.containFunc(it.funcName, it.pos) != null)
+        // throw new semanticError("redefinition of function " + it.funcName, it.pos);
+        // currentClass.defineFunc(it.funcName, it.retType.GetType(), it.argsDef,
+        // it.pos);
+        // nxtScopeType = ScopeType.FUNC;
+        // currentScope = new Scope(currentScope, ScopeType.FUNC);
+        // currentScope.returnType = it.retType.GetType();
+        // for (varDefStmtNode node : it.argsDef)
+        // node.accept(this);
+        // for (StmtNode stmt : it.stmts)
+        // stmt.accept(this);
+        // nxtScopeType = null;
+        // currentScope = gScope;
+        // return;
+        // }
 
         // if (gScope.containFunc(it.funcName, it.pos) != null)
         // throw new semanticError("redefinition of function " + it.funcName, it.pos);
@@ -161,6 +162,20 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(returnStmtNode it) {
+        if (ifinlambda) {
+            if (currentScope.returnType == null)
+                if (it.value != null)
+                    currentScope.returnType = it.value.type.GetType();
+                else
+                    currentScope.returnType = new Type("void");
+            else if (it.value != null)
+                if (!it.value.type.Equal(currentScope.returnType))
+                    throw new semanticError("different return type", it.pos);
+                else if (!currentScope.returnType.typeName.equals("void"))
+                    throw new semanticError("different return type", it.pos);
+
+            return;
+        }
         Type retType = currentScope.returnType();
         if (currentScope == gScope || retType == null)
             throw new semanticError("return doesn't exist in function.", it.pos);
@@ -172,7 +187,7 @@ public class SemanticChecker implements ASTVisitor {
             if (!it.value.type.Equal(retType))
                 throw new semanticError("type not match.",
                         it.value.pos);
-        } else if (!retType.typeName.equals("void"))
+        } else if (!retType.typeName.equals("void") && !retType.typeName.equals("Create"))
             throw new semanticError("type not match.",
                     null);
     }
@@ -259,27 +274,29 @@ public class SemanticChecker implements ASTVisitor {
         // == null))
         // throw new semanticError("variable not defined. ", it.pos);
         // currentClass = currentScope.getType(it.var.get(0).name, true);
-        if (!ifthis) {
-            if (!ifinclass) {
-                if (varType == null && currentScope.containVarible(it.name, false))
-                    varType = currentScope.getVaribleType(it.name, false);
-                if (varType == null && currentClass != null)
-                    varType = currentClass.containVarible(it.name);
-                if (varType == null && currentScope.containVarible(it.name, true))
-                    varType = currentScope.getVaribleType(it.name, true);
-            } else {
-                if (varType == null && currentClass != null)
-                    varType = currentClass.containVarible(it.name);
-            }
+
+        if (!ifinclass) {
+            if (varType == null && currentScope.containVarible(it.name, false))
+                varType = currentScope.getVaribleType(it.name, false);
+            if (varType == null && currentClass != null)
+                varType = currentClass.containVarible(it.name);
+            if (varType == null && currentScope.containVarible(it.name, true))
+                varType = currentScope.getVaribleType(it.name, true);
         } else {
-            ifthis = false;
             if (varType == null && currentClass != null)
                 varType = currentClass.containVarible(it.name);
         }
 
         if (varType == null)
             throw new semanticError("variable not defined. ", it.pos);
-
+        if (it.dimArgs != null)
+            for (int i = 0; i < it.dimArgs.size(); i++) {
+                it.dimArgs.get(i).accept(this);
+                if (it.dimArgs.get(i).type.GetType().dim != 0)
+                    throw new semanticError("assignment with different dimension", it.pos);
+                if (!it.dimArgs.get(i).type.GetType().typeName.equals("int"))
+                    throw new semanticError("dimension should be int", it.pos);
+            }
         it.type = new TypeNode(it.pos, varType, it.dim);
     }
 
@@ -328,16 +345,26 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(newExprNode it) {
         if (it.type.GetType().typeName.equals("void"))
             throw new semanticError("new expression cannot apply to void", it.pos);
+        if (it.type.GetType().dimArgs != null)
+            for (int i = 0; i < it.type.GetType().dimArgs.size(); i++) {
+                it.type.GetType().dimArgs.get(i).accept(this);
+                if (!it.type.GetType().dimArgs.get(i).type.GetType().typeName.equals("int"))
+                    throw new semanticError("dimension should be int", it.pos);
+            }
+        Type t = gScope.containType(it.type.GetType().typeName, it.pos);
+        it.type.GetType().funcs = t.funcs;
+        it.type.GetType().members = t.members;
     }
 
     @Override
     public void visit(unaryExprNode it) {
         it.expr.accept(this);
-        if (!it.type.GetType().typeName.equals("int"))
+        if (!it.expr.type.GetType().typeName.equals("int"))
             throw new semanticError("type not match. It should be int",
                     it.pos);
-        if (!it.expr.isAssignable())
+        if (!it.expr.isAssignable() && it.opCode != unaryOpType.tilde && it.opCode != unaryOpType.neg)
             throw new semanticError("left value operation is invalid", it.pos);
+        it.type = it.expr.type;
     }
 
     @Override
@@ -357,13 +384,16 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(funcCallExprNode it) {
         Func calledFunc = null;
 
-        if (currentClass != null && (ifthis || ifinclass)) {
-            if (ifthis)
-                ifthis = false;
+        if (currentClass != null && ifinclass) {
             calledFunc = currentClass.containFunc(it.name, it.pos);
-            if (calledFunc == null)
+            if (calledFunc == null && (!it.name.equals("size") || currentClass.dim == 0))
                 throw new semanticError("function " + it.name + " not exists", it.pos);
-            it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
+            if (calledFunc != null)
+                it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
+            else
+                it.type = new TypeNode(it.pos, gScope.containType("int", it.pos));
+            if (calledFunc != null)
+                it.type.GetType().dim = calledFunc.retType.dim;
             return;
         }
         if (currentClass != null) {
@@ -386,6 +416,9 @@ public class SemanticChecker implements ASTVisitor {
             } else {
                 it.type = new TypeNode(it.pos, gScope.containType("int", it.pos));
             }
+            if (calledFunc != null)
+                it.type.GetType().dim = calledFunc.retType.dim;
+
             // currentClass = null;
             return;
         }
@@ -402,6 +435,7 @@ public class SemanticChecker implements ASTVisitor {
                 throw new semanticError("type not match", it.pos);
         }
         it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
+        it.type.GetType().dim = calledFunc.retType.dim;
     }
 
     @Override
@@ -413,7 +447,12 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(TypeNode it) {
-
+        if (it.GetType().dimArgs != null)
+            for (int i = 0; i < it.GetType().dimArgs.size(); i++) {
+                it.GetType().dimArgs.get(i).accept(this);
+                if (!it.GetType().dimArgs.get(i).type.GetType().typeName.equals("int"))
+                    throw new semanticError("dimension should be int", it.pos);
+            }
     }
 
     @Override
@@ -423,11 +462,8 @@ public class SemanticChecker implements ASTVisitor {
         String currentClassName = null;
         if (currentClass != null)
             currentClassName = currentClass.typeName;
-        currentClass = gScope.containType(it.visitor.type.GetType().typeName, it.pos);
-        if (it.visitor.ifThis())
-            ifthis = true;
+        currentClass = it.visitor.type.GetType();
         it.visitee.accept(this);
-        ifthis = false;
         ifinclass = false;
         it.type = it.visitee.type;
         if (currentClassName != null)
@@ -441,6 +477,33 @@ public class SemanticChecker implements ASTVisitor {
         for (int i = 0; i < it.expr.size(); i++)
             it.expr.get(i).accept(this);
         it.type = new TypeNode(it.pos, it.expr.get(0).type.GetType(), it.expr.size() - 1);
+    }
+
+    @Override
+    public void visit(lambdaExprNode it) {
+        nxtScopeType = ScopeType.FUNC;
+        currentScope = new Scope(currentScope, ScopeType.FUNC);
+        ifinlambda = true;
+        if (it.args.size() != it.argsDef.size())
+            throw new semanticError("lambda function requires " + it.args.size()
+                    + " but has " + it.args.size(), it.pos);
+        for (varDefStmtNode node : it.argsDef)
+            node.accept(this);
+        for (int i = 0; i < it.args.size(); i++) {
+            it.args.get(i).accept(this);
+            if (!it.args.get(i).type.Equal(it.argsDef.get(i).var.get(0).type))
+                throw new semanticError("type not match", it.pos);
+        }
+        for (StmtNode stmt : it.stmts)
+            if (stmt != null)
+                stmt.accept(this);
+        if (currentScope.returnType == null)
+            it.type = new TypeNode(it.pos, new Type("void"));
+        else
+            it.type = new TypeNode(it.pos, currentScope.returnType);
+        ifinlambda = false;
+        nxtScopeType = null;
+        currentScope = gScope;
     }
 
 }

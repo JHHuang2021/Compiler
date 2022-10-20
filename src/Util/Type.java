@@ -17,13 +17,13 @@ public class Type {
     public Type() {
     }
 
-    public Type(int i) {
-        this.typeName = "int";
-    }
+    // public Type(int i) {
+    //     this.typeName = "int";
+    // }
 
     public Type(String typeName) {
         this.typeName = typeName;
-        funcs = new HashMap<>();
+        // funcs = new HashMap<>();
         // funcs.put("size", new Func(new Type(0), null));
     }
 

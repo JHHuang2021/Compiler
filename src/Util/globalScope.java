@@ -20,7 +20,7 @@ public class globalScope extends Scope {
         Type boolType = new Type("bool");
         this.addType("int", intType, null);
 
-        // stringType.funcs = new HashMap<>();
+        stringType.funcs = new HashMap<>();
 
         stringType.funcs.put("length", new Func(intType, null));
 

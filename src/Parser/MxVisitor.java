@@ -265,6 +265,12 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArraywitharg(MxParser.ArraywithargContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MxParser#wrongarraywitharg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWrongarraywitharg(MxParser.WrongarraywithargContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MxParser#dot}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

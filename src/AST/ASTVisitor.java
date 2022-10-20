@@ -48,4 +48,6 @@ public interface ASTVisitor {
     void visit(visitExprNode it);
 
     void visit(exprArrayNode it);
+
+    void visit(lambdaExprNode it);
 }
