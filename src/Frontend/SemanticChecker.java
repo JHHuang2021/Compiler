@@ -2,6 +2,8 @@ package Frontend;
 
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.misc.Pair;
+
 import AST.*;
 import AST.binaryExprNode.binaryOpType;
 import AST.unaryExprNode.unaryOpType;
@@ -12,6 +14,7 @@ import Util.Scope;
 import Util.Type;
 import Util.error.semanticError;
 import Util.globalScope;
+import Util.position;
 import Util.Scope.ScopeType;
 
 public class SemanticChecker implements ASTVisitor {
@@ -21,7 +24,6 @@ public class SemanticChecker implements ASTVisitor {
     private ScopeType nxtScopeType = null;
     private CheckName check = new CheckName();
     private boolean ifinclass = false;
-    private boolean ifinlambda = false;
 
     public SemanticChecker(globalScope gScope) {
         currentScope = this.gScope = gScope;
@@ -157,22 +159,27 @@ public class SemanticChecker implements ASTVisitor {
             var.type.members = t.members;
             var.type.funcs = t.funcs;
             currentScope.defineVarible(var.name, var.type, it.pos);
+            if (currentScope == gScope)
+                gScope.putDefineVariblePos(var.name, it.pos);
         }
     }
 
     @Override
     public void visit(returnStmtNode it) {
-        if (ifinlambda) {
+        if (currentScope.ifinlambda) {
             if (currentScope.returnType == null)
-                if (it.value != null)
+                if (it.value != null) {
+                    it.value.accept(this);
                     currentScope.returnType = it.value.type.GetType();
-                else
+                } else
                     currentScope.returnType = new Type("void");
-            else if (it.value != null)
+            else if (it.value != null) {
+                it.value.accept(this);
                 if (!it.value.type.Equal(currentScope.returnType))
                     throw new semanticError("different return type", it.pos);
                 else if (!currentScope.returnType.typeName.equals("void"))
                     throw new semanticError("different return type", it.pos);
+            }
 
             return;
         }
@@ -184,7 +191,14 @@ public class SemanticChecker implements ASTVisitor {
                 throw new semanticError("wrong position of this", it.pos);
         } else if (it.value != null) {
             it.value.accept(this);
-            if (!it.value.type.Equal(retType))
+            if (it.value.type.GetType().typeName.equals("Null")) {
+                Type l = retType;
+                if (l.dim == 0
+                        && (l.typeName.equals("int") || l.typeName.equals("bool")
+                                || l.typeName.equals("string"))) {
+                    throw new semanticError("type not match. ", it.pos);
+                }
+            } else if (!it.value.type.Equal(retType))
                 throw new semanticError("type not match.",
                         it.value.pos);
         } else if (!retType.typeName.equals("void") && !retType.typeName.equals("Create"))
@@ -268,7 +282,9 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(varExprNode it) {
+        Pair<Type, Boolean> ret = null;
         Type varType = null;
+        boolean flag = false;
         // if (!currentScope.contains(it.var.get(0).name, true)
         // && (currentClass == null || currentClass.containsVarible(it.var.get(0).name)
         // == null))
@@ -276,15 +292,32 @@ public class SemanticChecker implements ASTVisitor {
         // currentClass = currentScope.getType(it.var.get(0).name, true);
 
         if (!ifinclass) {
-            if (varType == null && currentScope.containVarible(it.name, false))
-                varType = currentScope.getVaribleType(it.name, false);
+            if (varType == null && currentScope.containVarible(it.name, false)) {
+                ret = currentScope.getVaribleType(it.name, false);
+                if (ret != null) {
+                    varType = ret.a;
+                    flag = ret.b;
+                }
+            }
             if (varType == null && currentClass != null)
                 varType = currentClass.containVarible(it.name);
-            if (varType == null && currentScope.containVarible(it.name, true))
-                varType = currentScope.getVaribleType(it.name, true);
+            if (varType == null && currentScope.containVarible(it.name, true)) {
+                ret = currentScope.getVaribleType(it.name, true);
+                if (ret != null) {
+                    varType = ret.a;
+                    flag = ret.b;
+                }
+            }
+            if (flag) {
+                position definePos = gScope.getDefineVariblePos(it.name);
+                if (definePos.row() > it.pos.row())
+                    throw new semanticError("Variable is not available for back reference.", it.pos);
+            }
+
         } else {
             if (varType == null && currentClass != null)
                 varType = currentClass.containVarible(it.name);
+            ifinclass = false;
         }
 
         if (varType == null)
@@ -375,8 +408,17 @@ public class SemanticChecker implements ASTVisitor {
         if (it.opCode.ordinal() >= 6 && (!it.lhs.type.GetType().typeName.equals("bool")
                 || (it.rhs != null && !it.rhs.type.GetType().typeName.equals("bool"))))
             throw new semanticError("type not match. ", it.pos);
-        else if (it.opCode.ordinal() < 6 && !it.lhs.type.Equal(it.rhs.type))
-            throw new semanticError("type not match. ", it.pos);
+        else if (it.opCode.ordinal() < 6) {
+            Type l = it.rhs.type.GetType();
+            if (it.rhs.type.GetType().typeName.equals("Null") && it.opCode.ordinal() <= 1) {
+                if (l.dim == 0
+                        && (l.typeName.equals("int") || l.typeName.equals("bool")
+                                || l.typeName.equals("string"))) {
+                    throw new semanticError("type not match. ", it.pos);
+                }
+            } else if (!it.lhs.type.Equal(it.rhs.type))
+                throw new semanticError("type not match. ", it.pos);
+        }
         it.type = new TypeNode(it.pos, new Type("bool"));
     }
 
@@ -394,6 +436,8 @@ public class SemanticChecker implements ASTVisitor {
                 it.type = new TypeNode(it.pos, gScope.containType("int", it.pos));
             if (calledFunc != null)
                 it.type.GetType().dim = calledFunc.retType.dim;
+            ifinclass = false;
+            // TODO judge args
             return;
         }
         if (currentClass != null) {
@@ -409,8 +453,15 @@ public class SemanticChecker implements ASTVisitor {
                             + " but has " + it.args.size(), it.pos);
                 for (int i = 0; i < it.args.size(); i++) {
                     it.args.get(i).accept(this);
-                    if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type))
-                        throw new semanticError("type not match", it.pos);
+                    if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type)) {
+                        Type l = calledFunc.args.get(i).var.get(0).type;
+                        if (it.args.get(i).type.GetType().typeName.equals("Null") && (l.dim == 0
+                                && (l.typeName.equals("int") || l.typeName.equals("bool")
+                                        || l.typeName.equals("string"))))
+                            throw new semanticError("null cannot be assigned to primitive type variable", it.pos);
+                        else if (!it.args.get(i).type.GetType().typeName.equals("Null"))
+                            throw new semanticError("type not match", it.pos);
+                    }
                 }
                 it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
             } else {
@@ -431,8 +482,14 @@ public class SemanticChecker implements ASTVisitor {
                     + " but has " + it.args.size(), it.pos);
         for (int i = 0; i < it.args.size(); i++) {
             it.args.get(i).accept(this);
-            if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type))
-                throw new semanticError("type not match", it.pos);
+            if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type)) {
+                Type l = calledFunc.args.get(i).var.get(0).type;
+                if (it.args.get(i).type.GetType().typeName.equals("Null") && (l.dim == 0
+                        && (l.typeName.equals("int") || l.typeName.equals("bool") || l.typeName.equals("string"))))
+                    throw new semanticError("null cannot be assigned to primitive type variable", it.pos);
+                else if (!it.args.get(i).type.GetType().typeName.equals("Null"))
+                    throw new semanticError("type not match", it.pos);
+            }
         }
         it.type = new TypeNode(it.pos, gScope.containType(calledFunc.retType.typeName, it.pos));
         it.type.GetType().dim = calledFunc.retType.dim;
@@ -462,7 +519,10 @@ public class SemanticChecker implements ASTVisitor {
         String currentClassName = null;
         if (currentClass != null)
             currentClassName = currentClass.typeName;
+        Type t = gScope.containType(it.visitor.type.GetType().typeName, it.pos);
         currentClass = it.visitor.type.GetType();
+        currentClass.funcs = t.funcs;
+        currentClass.members = t.members;
         it.visitee.accept(this);
         ifinclass = false;
         it.type = it.visitee.type;
@@ -483,7 +543,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(lambdaExprNode it) {
         nxtScopeType = ScopeType.FUNC;
         currentScope = new Scope(currentScope, ScopeType.FUNC);
-        ifinlambda = true;
+        currentScope.ifinlambda = true;
         if (it.args.size() != it.argsDef.size())
             throw new semanticError("lambda function requires " + it.args.size()
                     + " but has " + it.args.size(), it.pos);
@@ -501,9 +561,8 @@ public class SemanticChecker implements ASTVisitor {
             it.type = new TypeNode(it.pos, new Type("void"));
         else
             it.type = new TypeNode(it.pos, currentScope.returnType);
-        ifinlambda = false;
         nxtScopeType = null;
-        currentScope = gScope;
+        currentScope = currentScope.parentScope();
     }
 
 }

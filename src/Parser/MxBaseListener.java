@@ -88,18 +88,6 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBlock(MxParser.BlockContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBlock(MxParser.BlockContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterVardefStmt(MxParser.VardefStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -107,6 +95,30 @@ public class MxBaseListener implements MxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitVardefStmt(MxParser.VardefStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPureExprStmt(MxParser.PureExprStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPureExprStmt(MxParser.PureExprStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBlock(MxParser.BlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBlock(MxParser.BlockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -179,18 +191,6 @@ public class MxBaseListener implements MxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitContinueStmt(MxParser.ContinueStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterPureExprStmt(MxParser.PureExprStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPureExprStmt(MxParser.PureExprStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

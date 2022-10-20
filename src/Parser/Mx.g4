@@ -12,8 +12,9 @@ suite: '{' statement* '}';
 body: (suite | statement);
 forexpr1: (varDef | expression)?;
 statement:
-	suite		# block
-	| varDef	# vardefStmt
+	varDef				# vardefStmt
+	| expression ';'	# pureExprStmt
+	| suite				# block
 	| If '(' expression ')' thensent = body (
 		Else elsesent = body
 	)? # ifStmt
@@ -25,7 +26,6 @@ statement:
 	| Return (expression?) ';'						# returnStmt
 	| Break ';'										# breakStmt
 	| Continue ';'									# continueStmt
-	| expression ';'								# pureExprStmt
 	| ';'											# emptyStmt;
 
 expression:

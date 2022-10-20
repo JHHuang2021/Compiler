@@ -11,6 +11,7 @@ import AST.varDefStmtNode.Var;
 public class globalScope extends Scope {
     private HashMap<String, Type> types = new HashMap<>();
     private HashMap<String, Func> funcs = new HashMap<>();
+    private HashMap<String, position> gScopeV = new HashMap<>();
 
     public globalScope(Scope parentScope) {
         super(parentScope);
@@ -86,5 +87,13 @@ public class globalScope extends Scope {
             return types.get(name);
         else
             return null;
+    }
+
+    public void putDefineVariblePos(String name, position pos) {
+        gScopeV.put(name, pos);
+    }
+
+    public position getDefineVariblePos(String name) {
+        return gScopeV.get(name);
     }
 }

@@ -5,11 +5,14 @@ import Util.error.semanticError;
 
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.misc.Pair;
+
 public class Scope {
 
     private HashMap<String, Type> members;
     // public HashMap<String, register> entities = new HashMap<>();
     public Type returnType = null;
+    public boolean ifinlambda = false;
     private Scope parentScope;
 
     public enum ScopeType {
@@ -66,10 +69,13 @@ public class Scope {
             return false;
     }
 
-    public Type getVaribleType(String name, boolean lookUpon) {
-        if (members.containsKey(name))
-            return members.get(name);
-        else if (parentScope != null && lookUpon)
+    public Pair<Type, Boolean> getVaribleType(String name, boolean lookUpon) {
+        if (members.containsKey(name)) {
+            if (parentScope == null)
+                return new Pair<>(members.get(name), true);
+            else if (lookUpon)
+                return new Pair<>(members.get(name), false);
+        } else if (parentScope != null && lookUpon)
             return parentScope.getVaribleType(name, true);
         return null;
     }
