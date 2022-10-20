@@ -73,7 +73,7 @@ public class Scope {
         if (members.containsKey(name)) {
             if (parentScope == null)
                 return new Pair<>(members.get(name), true);
-            else if (lookUpon)
+            else
                 return new Pair<>(members.get(name), false);
         } else if (parentScope != null && lookUpon)
             return parentScope.getVaribleType(name, true);
