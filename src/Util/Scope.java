@@ -11,9 +11,9 @@ public class Scope {
 
     private HashMap<String, Type> members;
     // public HashMap<String, register> entities = new HashMap<>();
-    public Type returnType = null;
-    public boolean ifinlambda = false;
-    private Scope parentScope;
+    public Type return_type = null;
+    public boolean if_in_lambda = false;
+    private Scope parent_scope;
 
     public enum ScopeType {
         FOR, WHILE, IF, FUNC
@@ -21,70 +21,62 @@ public class Scope {
 
     public ScopeType scopeType = null;
 
-    public Scope(Scope parentScope) {
+    public Scope(Scope parent_scope) {
         members = new HashMap<>();
-        this.parentScope = parentScope;
+        this.parent_scope = parent_scope;
     }
 
-    public Scope(Scope parentScope, ScopeType scopeType) {
+    public Scope(Scope parent_scope, ScopeType scopeType) {
         members = new HashMap<>();
-        this.parentScope = parentScope;
+        this.parent_scope = parent_scope;
         this.scopeType = scopeType;
     }
 
-    public Scope parentScope() {
-        return parentScope;
+    public Scope ParentScope() {
+        return parent_scope;
     }
 
-    public boolean containScopeType(ScopeType scopeType, boolean lookUpon) {
+    public boolean ContainScopeType(ScopeType scopeType, boolean lookUpon) {
         if (this.scopeType == scopeType)
             return true;
-        else if (parentScope != null && lookUpon)
-            return parentScope.containScopeType(scopeType, lookUpon);
+        else if (parent_scope != null && lookUpon)
+            return parent_scope.ContainScopeType(scopeType, lookUpon);
         else
             return false;
     }
 
-    public Type returnType() {
-        if (this.returnType != null)
-            return this.returnType;
-        else if (parentScope != null)
-            return parentScope.returnType();
+    public Type ReturnType() {
+        if (this.return_type != null)
+            return this.return_type;
+        else if (parent_scope != null)
+            return parent_scope.ReturnType();
         else
             return null;
     }
 
-    public void defineVarible(String name, Type t, position pos) {
+    public void DefineVarible(String name, Type t, position pos) {
         if (members.containsKey(name))
             throw new semanticError("redefine", pos);
         members.put(name, t);
     }
 
-    public boolean containVarible(String name, boolean lookUpon) {
+    public boolean ContainVarible(String name, boolean lookUpon) {
         if (members.containsKey(name))
             return true;
-        else if (parentScope != null && lookUpon)
-            return parentScope.containVarible(name, true);
+        else if (parent_scope != null && lookUpon)
+            return parent_scope.ContainVarible(name, true);
         else
             return false;
     }
 
-    public Pair<Type, Boolean> getVaribleType(String name, boolean lookUpon) {
+    public Pair<Type, Boolean> GetVaribleType(String name, boolean lookUpon) {
         if (members.containsKey(name)) {
-            if (parentScope == null)
+            if (parent_scope == null)
                 return new Pair<>(members.get(name), true);
             else
                 return new Pair<>(members.get(name), false);
-        } else if (parentScope != null && lookUpon)
-            return parentScope.getVaribleType(name, true);
+        } else if (parent_scope != null && lookUpon)
+            return parent_scope.GetVaribleType(name, true);
         return null;
     }
-
-    // public register getEntity(String name, boolean lookUpon) {
-    // if (entities.containsKey(name))
-    // return entities.get(name);
-    // else if (parentScope != null && lookUpon)
-    // return parentScope.getEntity(name, true);
-    // return null;
-    // }
 }

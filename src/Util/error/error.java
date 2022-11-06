@@ -11,7 +11,7 @@ abstract public class error extends RuntimeException {
         this.message = msg;
     }
 
-    public String toString() {
+    public String ToString() {
         if (pos != null)
             return message + ": " + pos.toString();
         return message;

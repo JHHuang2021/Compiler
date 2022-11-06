@@ -3,10 +3,10 @@
 // import Assembly.AsmFn;
 // import Backend.*;
 // import org.antlr.v4.gui.TreeViewer;
-import Parser.MxLexer;
-import Parser.MxParser;
+import Frontend.Parser.MxLexer;
+import Frontend.Parser.MxParser;
 import Util.MxErrorListener;
-import Util.globalScope;
+import Util.GlobalScope;
 import Util.error.error;
 
 // import java.io.FileInputStream;
@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import AST.RootNode;
+import Frontend.AST.RootNode;
 import Frontend.*;
 
 public class Compiler {
@@ -29,7 +29,7 @@ public class Compiler {
 
         try {
             RootNode ASTRoot;
-            globalScope gScope = new globalScope(null);
+            GlobalScope global_scope = new GlobalScope(null);
 
             MxLexer lexer = new MxLexer(CharStreams.fromStream(input));
             lexer.removeErrorListeners();
@@ -37,7 +37,7 @@ public class Compiler {
             MxParser parser = new MxParser(new CommonTokenStream(lexer));
             parser.removeErrorListeners();
             parser.addErrorListener(new MxErrorListener());
-            ParseTree parseTreeRoot = parser.program();
+            ParseTree parse_tree_root = parser.program();
             // show AST in console
             // System.out.println(parseTreeRoot.toStringTree(parser));
 
@@ -46,14 +46,14 @@ public class Compiler {
             // parser.getRuleNames()), parseTreeRoot);
             // viewr.open();
 
-            ASTBuilder astBuilder = new ASTBuilder(gScope);
-            ASTRoot = (RootNode) astBuilder.visit(parseTreeRoot);
+            ASTBuilder ast_builder = new ASTBuilder(global_scope);
+            ASTRoot = (RootNode) ast_builder.visit(parse_tree_root);
             // System.out.println("test");
-            new SymbolCollector(gScope).visit(ASTRoot);
-            new SemanticChecker(gScope).visit(ASTRoot);
+            new SymbolCollector(global_scope).visit(ASTRoot);
+            new SemanticChecker(global_scope).visit(ASTRoot);
 
             // mainFn f = new mainFn();
-            // new IRBuilder(f, gScope).visit(ASTRoot);
+            // new IRBuilder(f, global_scope).visit(ASTRoot);
             // new IRPrinter(System.out).visitFn(f);
 
             // AsmFn asmF = new AsmFn();
@@ -61,7 +61,7 @@ public class Compiler {
             // new RegAlloc(asmF).work();
             // new AsmPrinter(asmF, System.out).print();
         } catch (error er) {
-            System.out.println(er.toString());
+            System.out.println(er.ToString());
             throw new RuntimeException();
         }
     }

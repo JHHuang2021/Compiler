@@ -5,95 +5,95 @@ import Util.error.semanticError;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import AST.varDefStmtNode;
-import AST.varDefStmtNode.Var;
+import Frontend.AST.VarDefStmtNode;
+import Frontend.AST.VarDefStmtNode.Var;
 
-public class globalScope extends Scope {
+public class GlobalScope extends Scope {
     private HashMap<String, Type> types = new HashMap<>();
     private HashMap<String, Func> funcs = new HashMap<>();
-    private HashMap<String, position> gScopeV = new HashMap<>();
+    private HashMap<String, position> global_varibles = new HashMap<>();
 
-    public globalScope(Scope parentScope) {
-        super(parentScope);
-        Type intType = new Type("int");
-        Type stringType = new Type("string");
-        Type voidType = new Type("void");
-        Type boolType = new Type("bool");
-        this.addType("int", intType, null);
+    public GlobalScope(Scope parent_scope) {
+        super(parent_scope);
+        Type int_type = new Type("int");
+        Type string_type = new Type("string");
+        Type void_type = new Type("void");
+        Type bool_type = new Type("bool");
+        this.AddType("int", int_type, null);
 
-        stringType.funcs = new HashMap<>();
+        string_type.funcs = new HashMap<>();
 
-        stringType.funcs.put("length", new Func(intType, null));
+        string_type.funcs.put("length", new Func(int_type, null));
 
-        ArrayList<varDefStmtNode> argSub = new ArrayList<>();
-        argSub.add(new varDefStmtNode(null, new Var(intType, "left", null)));
-        argSub.add(new varDefStmtNode(null, new Var(intType, "right", null)));
-        stringType.funcs.put("substring", new Func(stringType, argSub));
+        ArrayList<VarDefStmtNode> arg_sub = new ArrayList<>();
+        arg_sub.add(new VarDefStmtNode(null, new Var(int_type, "left", null)));
+        arg_sub.add(new VarDefStmtNode(null, new Var(int_type, "right", null)));
+        string_type.funcs.put("substring", new Func(string_type, arg_sub));
 
-        stringType.funcs.put("parseInt", new Func(intType, null));
+        string_type.funcs.put("parseInt", new Func(int_type, null));
 
-        ArrayList<varDefStmtNode> argOrd = new ArrayList<>();
-        argOrd.add(new varDefStmtNode(null, new Var(intType, "pos", null)));
-        stringType.funcs.put("ord", new Func(intType, argOrd));
+        ArrayList<VarDefStmtNode> arg_ord = new ArrayList<>();
+        arg_ord.add(new VarDefStmtNode(null, new Var(int_type, "pos", null)));
+        string_type.funcs.put("ord", new Func(int_type, arg_ord));
 
-        this.addType("string", stringType, null);
+        this.AddType("string", string_type, null);
 
-        this.addType("bool", boolType, null);
-        this.addType("void", voidType, null);
+        this.AddType("bool", bool_type, null);
+        this.AddType("void", void_type, null);
 
-        ArrayList<varDefStmtNode> argStr = new ArrayList<>();
-        argStr.add(new varDefStmtNode(null, new Var(stringType, "str", null)));
-        this.defineFunc("print", voidType, argStr, null);
+        ArrayList<VarDefStmtNode> arg_str = new ArrayList<>();
+        arg_str.add(new VarDefStmtNode(null, new Var(string_type, "str", null)));
+        this.DefineFunc("print", void_type, arg_str, null);
 
-        this.defineFunc("println", voidType, argStr, null);
+        this.DefineFunc("println", void_type, arg_str, null);
 
-        ArrayList<varDefStmtNode> argInt = new ArrayList<>();
-        argInt.add(new varDefStmtNode(null, new Var(intType, "int", null)));
-        this.defineFunc("printInt", voidType, argInt, null);
+        ArrayList<VarDefStmtNode> arg_int = new ArrayList<>();
+        arg_int.add(new VarDefStmtNode(null, new Var(int_type, "int", null)));
+        this.DefineFunc("printInt", void_type, arg_int, null);
 
-        this.defineFunc("printlnInt", voidType, argInt, null);
-        this.defineFunc("getString", stringType, null, null);
-        this.defineFunc("getInt", intType, null, null);
-        this.defineFunc("toString", stringType, argInt, null);
+        this.DefineFunc("printlnInt", void_type, arg_int, null);
+        this.DefineFunc("getString", string_type, null, null);
+        this.DefineFunc("getInt", int_type, null, null);
+        this.DefineFunc("toString", string_type, arg_int, null);
 
     }
 
-    public void defineFunc(String name, Type retType, ArrayList<varDefStmtNode> args, position pos) {
+    public void DefineFunc(String name, Type retType, ArrayList<VarDefStmtNode> args, position pos) {
         if (funcs.containsKey(name))
             throw new semanticError("multiple definition of " + name, pos);
         funcs.put(name, new Func(retType, args));
     }
 
-    public void delFunc(String name) {
+    public void DelFunc(String name) {
         funcs.remove(name);
     }
 
-    public Func containFunc(String name, position pos) {
+    public Func ContainFunc(String name, position pos) {
         if (funcs.containsKey(name))
             return funcs.get(name);
         else
             return null;
     }
 
-    public void addType(String name, Type t, position pos) {
+    public void AddType(String name, Type t, position pos) {
         if (types.containsKey(name))
             throw new semanticError("multiple definition of " + name, pos);
-        t.typeName = name;
+        t.type_name = name;
         types.put(name, t);
     }
 
-    public Type containType(String name, position pos) {
+    public Type ContainType(String name, position pos) {
         if (types.containsKey(name))
             return types.get(name);
         else
             return null;
     }
 
-    public void putDefineVariblePos(String name, position pos) {
-        gScopeV.put(name, pos);
+    public void PutDefineVariblePos(String name, position pos) {
+        global_varibles.put(name, pos);
     }
 
-    public position getDefineVariblePos(String name) {
-        return gScopeV.get(name);
+    public position GetDefineVariblePos(String name) {
+        return global_varibles.get(name);
     }
 }

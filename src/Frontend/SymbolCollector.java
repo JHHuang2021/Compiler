@@ -1,160 +1,160 @@
 package Frontend;
 
-import AST.*;
-import AST.varDefStmtNode.Var;
+import Frontend.AST.*;
+import Frontend.AST.VarDefStmtNode.Var;
 import Util.Type;
-import Util.globalScope;
+import Util.GlobalScope;
 import Util.error.semanticError;
 
 import java.util.HashMap;
 
 public class SymbolCollector implements ASTVisitor {
-    private globalScope gScope;
-    private Type currentClass = null;
+    private GlobalScope global_scope;
+    private Type current_class = null;
 
-    public SymbolCollector(globalScope gScope) {
-        this.gScope = gScope;
+    public SymbolCollector(GlobalScope global_scope) {
+        this.global_scope = global_scope;
 
     }
 
     @Override
     public void visit(RootNode it) {
         // it.strDefs.forEach(sd -> sd.accept(this));
-        // it.classDefs.forEach(cd -> cd.accept(this));
-        // for (int i = 0; i < it.varDefs.size(); i++)
-        // it.varDefs.get(i).accept(this);
-        for (int i = 0; i < it.classDefs.size(); i++)
-            it.classDefs.get(i).accept(this);
-        for (int i = 0; i < it.funcDefs.size(); i++)
-            it.funcDefs.get(i).accept(this);
+        // it.class_defs.forEach(cd -> cd.accept(this));
+        // for (int i = 0; i < it.var_defs.size(); i++)
+        // it.var_defs.get(i).accept(this);
+        for (int i = 0; i < it.class_defs.size(); i++)
+            it.class_defs.get(i).accept(this);
+        for (int i = 0; i < it.func_defs.size(); i++)
+            it.func_defs.get(i).accept(this);
     }
 
     @Override
-    public void visit(classDefNode it) {
+    public void visit(ClassDefNode it) {
         Type newClass = new Type(it.name);
         newClass.members = new HashMap<>();
-        currentClass = newClass;
-        for (int i = 0; i < it.varDefs.size(); i++)
-            it.varDefs.get(i).accept(this);
-        for (int i = 0; i < it.funcDefs.size(); i++)
-            it.funcDefs.get(i).accept(this);
-        currentClass = null;
-        gScope.addType(it.name, newClass, it.pos);
+        current_class = newClass;
+        for (int i = 0; i < it.var_defs.size(); i++)
+            it.var_defs.get(i).accept(this);
+        for (int i = 0; i < it.func_defs.size(); i++)
+            it.func_defs.get(i).accept(this);
+        current_class = null;
+        global_scope.AddType(it.name, newClass, it.pos);
     }
 
     @Override
-    public void visit(FnNode it) {
-        if (currentClass != null) {
-            if (currentClass.funcs == null)
-                currentClass.funcs = new HashMap<>();
-            if (currentClass.containFunc(it.funcName, it.pos) != null)
-                throw new semanticError("redefinition of function " + it.funcName, it.pos);
-            if (it.retType == null) {
-                if (!it.funcName.equals(currentClass.typeName))
+    public void visit(FunctionNode it) {
+        if (current_class != null) {
+            if (current_class.funcs == null)
+                current_class.funcs = new HashMap<>();
+            if (current_class.ContainFunc(it.func_name, it.pos) != null)
+                throw new semanticError("redefinition of function " + it.func_name, it.pos);
+            if (it.ret_type == null) {
+                if (!it.func_name.equals(current_class.type_name))
                     throw new semanticError("The name of class constructor must be the same as the class name.",
                             it.pos);
-                it.retType = new TypeNode(it.pos, new Type("Create"));
-            } else if (it.funcName.equals(currentClass.typeName))
+                it.ret_type =  new Type("Create");
+            } else if (it.func_name.equals(current_class.type_name))
                 throw new semanticError("Constructor Type Error.", it.pos);
-            currentClass.defineFunc(it.funcName, it.retType.GetType(), it.argsDef, it.pos);
+            current_class.DefineFunc(it.func_name, it.ret_type, it.args_def, it.pos);
             return;
         }
-        if (gScope.containFunc(it.funcName, it.pos) != null || gScope.containType(it.funcName, it.pos) != null)
-            throw new semanticError("redefinition of function " + it.funcName, it.pos);
-        gScope.defineFunc(it.funcName, it.retType.GetType(), it.argsDef, it.pos);
+        if (global_scope.ContainFunc(it.func_name, it.pos) != null || global_scope.ContainType(it.func_name, it.pos) != null)
+            throw new semanticError("redefinition of function " + it.func_name, it.pos);
+        global_scope.DefineFunc(it.func_name, it.ret_type, it.args_def, it.pos);
     }
 
     @Override
-    public void visit(varDefStmtNode it) {
+    public void visit(VarDefStmtNode it) {
         for (Var var : it.var) {
-            if (currentClass.members.containsKey(var.name))
+            if (current_class.members.containsKey(var.name))
                 throw new semanticError("redefinition of member " + var.name, it.pos);
-            Type t = gScope.containType(var.type.typeName, it.pos);
+            Type t = global_scope.ContainType(var.type.type_name, it.pos);
             if (t != null) {
                 var.type.members = t.members;
                 var.type.funcs = t.funcs;
-                currentClass.members.put(var.name, var.type);
+                current_class.members.put(var.name, var.type);
             } else {
-                currentClass.members.put(var.name, var.type);
+                current_class.members.put(var.name, var.type);
             }
         }
     }
 
     @Override
-    public void visit(returnStmtNode it) {
+    public void visit(ReturnStmtNode it) {
     }
 
     @Override
-    public void visit(suiteStmtNode it) {
+    public void visit(SuiteStmtNode it) {
     }
 
     @Override
-    public void visit(exprStmtNode it) {
+    public void visit(ExprStmtNode it) {
     }
 
     @Override
-    public void visit(ifStmtNode it) {
+    public void visit(IfStmtNode it) {
     }
 
     @Override
-    public void visit(assignExprNode it) {
+    public void visit(AssignExprNode it) {
     }
 
     @Override
-    public void visit(binaryExprNode it) {
+    public void visit(BinaryExprNode it) {
     }
 
     @Override
-    public <T> void visit(constExprNode<T> it) {
+    public <T> void visit(ConstExprNode<T> it) {
     }
 
     // @Override public void visit(cmpExprNode it) {}
     @Override
-    public void visit(varExprNode it) {
+    public void visit(VarExprNode it) {
     }
 
     @Override
-    public void visit(forStmtNode it) {
-
-    }
-
-    @Override
-    public void visit(whileStmtNode it) {
+    public void visit(ForStmtNode it) {
 
     }
 
     @Override
-    public void visit(breakStmtNode it) {
+    public void visit(WhileStmtNode it) {
 
     }
 
     @Override
-    public void visit(continueStmtNode it) {
+    public void visit(BreakStmtNode it) {
 
     }
 
     @Override
-    public void visit(newExprNode it) {
+    public void visit(ContinueStmtNode it) {
 
     }
 
     @Override
-    public void visit(unaryExprNode it) {
+    public void visit(NewExprNode it) {
 
     }
 
     @Override
-    public void visit(logicExprNode it) {
+    public void visit(UnaryExprNode it) {
 
     }
 
     @Override
-    public void visit(funcCallExprNode it) {
+    public void visit(LogicExprNode it) {
 
     }
 
     @Override
-    public void visit(thisExprNode it) {
+    public void visit(FuncCallExprNode it) {
+
+    }
+
+    @Override
+    public void visit(ThisExprNode it) {
 
     }
 
@@ -164,18 +164,17 @@ public class SymbolCollector implements ASTVisitor {
     }
 
     @Override
-    public void visit(visitExprNode it) {
+    public void visit(VisitExprNode it) {
 
     }
 
     @Override
-    public void visit(exprArrayNode it) {
+    public void visit(ExprArrayNode it) {
 
     }
 
     @Override
-    public void visit(lambdaExprNode it) {
-        // TODO Auto-generated method stub
-        
+    public void visit(LambdaExprNode it) {
+
     }
 }
