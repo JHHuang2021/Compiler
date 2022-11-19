@@ -223,22 +223,20 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitPrimary(MxParser.PrimaryContext ctx) {
         if (ctx.Identifier() != null) {
-            int dim = ctx.expression().size();
-            ArrayList<ExprNode> dim_args = null;
-            if (dim > 0) {
-                dim_args = new ArrayList<>();
-                for (int i = 0; i < dim; i++)
-                    dim_args.add((ExprNode) visit(ctx.expression(i)));
-            }
+            // int dim = ctx.expression().size();
+            // ArrayList<ExprNode> dim_args = null;
+            // if (dim > 0) {
+            // dim_args = new ArrayList<>();
+            // for (int i = 0; i < dim; i++)
+            // dim_args.add((ExprNode) visit(ctx.expression(i)));
+            // }
 
-            return new VarExprNode(new position(ctx), ctx.Identifier().getText(), dim, dim_args);
+            return new VarExprNode(new position(ctx), ctx.Identifier().getText());
         }
-        // if (ctx.This() != null)
-        // return new varExprNode(new position(ctx));
         if (ctx.literal() != null)
             return visit(ctx.literal());
-        if (ctx.expression().size() != 0)
-            return (ExprNode) visit(ctx.expression(0));
+        if (ctx.expression() != null)
+            return (ExprNode) visit(ctx.expression());
         if (ctx.This() != null)
             return new ThisExprNode(new position(ctx));
         return null;
@@ -451,8 +449,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitExprArray(MxParser.ExprArrayContext ctx) {
         ExprArrayNode node = new ExprArrayNode(new position(ctx));
-        for (int i = 0; i < ctx.expression().size(); i++)
-            node.expr.add((ExprNode) visit(ctx.expression(i)));
+        node.expr=(ExprNode)visit(ctx.expression(0));
+        node.offset=(ExprNode)visit(ctx.expression(1));
         return node;
     }
 

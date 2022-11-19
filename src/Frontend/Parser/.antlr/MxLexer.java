@@ -1,4 +1,4 @@
-// Generated from /mnt/d/Projects/Compiler/src/Parser/Mx.g4 by ANTLR 4.9.2
+// Generated from /mnt/d/Projects/Compiler/src/Frontend/Parser/Mx.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

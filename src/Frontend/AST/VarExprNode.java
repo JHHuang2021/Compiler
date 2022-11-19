@@ -1,20 +1,14 @@
 package Frontend.AST;
 
-import java.util.ArrayList;
-
 import Util.position;
 
 public class VarExprNode extends ExprNode {
 
     public String name;
-    public int dim = 0;
-    public ArrayList<ExprNode> dim_args = null;
 
-    public VarExprNode(position pos, String name, int dim, ArrayList<ExprNode> dim_args) {
+    public VarExprNode(position pos, String name) {
         super(pos);
         this.name = name;
-        this.dim = dim;
-        this.dim_args = dim_args;
     }
 
     @Override

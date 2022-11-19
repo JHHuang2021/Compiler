@@ -29,7 +29,7 @@ statement:
 	| ';'											# emptyStmt;
 
 expression:
-	expression ('[' expression ']')+											# exprArray
+	expression ('[' expression ']')												# exprArray
 	| primary																	# atomExpr
 	| expression '.' expression													# visitExpr
 	| New (typewitharg | createFuncCall)										# newExpr
@@ -44,11 +44,7 @@ expression:
 	| expression '=' expression													# assignExpr
 	| lambdaExpression															# lambda;
 
-primary:
-	literal
-	| This
-	| '(' expression ')'
-	| Identifier ('[' expression ']')*;
+primary: literal | This | '(' expression ')' | Identifier;
 
 argDef: (type Identifier)? (',' type Identifier)*;
 arg: expression? ( ',' expression)*;

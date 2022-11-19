@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import Backend.IR.IRBuilder;
 import Frontend.AST.RootNode;
 import Frontend.*;
 
@@ -53,7 +54,7 @@ public class Compiler {
             new SemanticChecker(global_scope).visit(ASTRoot);
 
             // mainFn f = new mainFn();
-            // new IRBuilder(f, global_scope).visit(ASTRoot);
+            new IRBuilder().visit(ASTRoot);
             // new IRPrinter(System.out).visitFn(f);
 
             // AsmFn asmF = new AsmFn();

@@ -280,15 +280,16 @@ public class SemanticChecker implements ASTVisitor {
 
         if (var_type == null)
             throw new semanticError("variable not defined. ", it.pos);
-        if (it.dim_args != null)
-            for (int i = 0; i < it.dim_args.size(); i++) {
-                it.dim_args.get(i).accept(this);
-                if (it.dim_args.get(i).type.dim != 0)
-                    throw new semanticError("assignment with different dimension", it.pos);
-                if (!it.dim_args.get(i).type.type_name.equals("int"))
-                    throw new semanticError("dimension should be int", it.pos);
-            }
-        it.type = new Type(var_type, it.dim);
+        // if (it.dim_args != null)
+        // for (int i = 0; i < it.dim_args.size(); i++) {
+        // it.dim_args.get(i).accept(this);
+        // if (it.dim_args.get(i).type.dim != 0)
+        // throw new semanticError("assignment with different dimension", it.pos);
+        // if (!it.dim_args.get(i).type.type_name.equals("int"))
+        // throw new semanticError("dimension should be int", it.pos);
+        // }
+        it.type = new Type(var_type, 0);
+        // it.type = new Type(var_type, it.dim);
     }
 
     @Override
@@ -363,12 +364,12 @@ public class SemanticChecker implements ASTVisitor {
         it.lhs.accept(this);
         if (it.rhs != null)
             it.rhs.accept(this);
-        if (it.opCode.ordinal() >= 6 && (!it.lhs.type.type_name.equals("bool")
+        if (it.op_code.ordinal() >= 6 && (!it.lhs.type.type_name.equals("bool")
                 || (it.rhs != null && !it.rhs.type.type_name.equals("bool"))))
             throw new semanticError("type not match. ", it.pos);
-        else if (it.opCode.ordinal() < 6) {
+        else if (it.op_code.ordinal() < 6) {
             Type l = it.rhs.type;
-            if (it.rhs.type.type_name.equals("Null") && it.opCode.ordinal() <= 1) {
+            if (it.rhs.type.type_name.equals("Null") && it.op_code.ordinal() <= 1) {
                 if (l.dim == 0
                         && (l.type_name.equals("int") || l.type_name.equals("bool")
                                 || l.type_name.equals("string"))) {
@@ -492,9 +493,9 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(ExprArrayNode it) {
-        for (int i = 0; i < it.expr.size(); i++)
-            it.expr.get(i).accept(this);
-        it.type = new Type(it.expr.get(0).type, it.expr.size() - 1);
+        it.expr.accept(this);
+        it.offset.accept(this);
+        it.type = new Type(it.expr.type, 1);
     }
 
     @Override

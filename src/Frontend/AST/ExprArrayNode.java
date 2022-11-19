@@ -1,11 +1,10 @@
 package Frontend.AST;
 
-import java.util.ArrayList;
-
 import Util.position;
 
 public class ExprArrayNode extends ExprNode {
-    public ArrayList<ExprNode> expr = new ArrayList<>();
+    public ExprNode expr = null;
+    public ExprNode offset = null;
 
     public ExprArrayNode(position pos) {
         super(pos);
@@ -18,7 +17,7 @@ public class ExprArrayNode extends ExprNode {
 
     @Override
     public boolean isAssignable() {
-        return expr.get(0).isAssignable();
+        return expr.isAssignable();
     }
 
 }

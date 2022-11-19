@@ -10,13 +10,13 @@ public class LogicExprNode extends ExprNode {
         eq, neq, le, ge, leq, geq, not, andand, oror
     }
 
-    public LogicOpType opCode;
+    public LogicOpType op_code;
 
-    public LogicExprNode(ExprNode lhs, ExprNode rhs, LogicOpType opCode, position pos) {
+    public LogicExprNode(ExprNode lhs, ExprNode rhs, LogicOpType op_code, position pos) {
         super(pos);
         this.lhs = lhs;
         this.rhs = rhs;
-        this.opCode = opCode;
+        this.op_code = op_code;
         this.type = new Type("bool");
     }
 

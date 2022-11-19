@@ -2,6 +2,7 @@ package Frontend.AST;
 
 import java.util.ArrayList;
 
+import Backend.IR.IRValue.IRValue;
 import Util.Type;
 import Util.position;
 
@@ -11,6 +12,7 @@ public class VarDefStmtNode extends StmtNode {
         public Type type;
         public String name;
         public ExprNode init;
+        public IRValue val;
 
         public Var(Type type, String name, ExprNode init) {
             this.type = type;
