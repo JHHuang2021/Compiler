@@ -16,4 +16,14 @@ public class IRBr extends IRInstr {
         this.true_block = true_block;
         this.false_block = false_block;
     }
+
+    @Override
+    public String ToString() {
+        String str = "br ";
+        if (cond != null) {
+            str += "i1 " + cond.ToString() + ", label " + true_block.PrintInSentence() + ", label " + false_block.PrintInSentence();
+        } else
+            str += "label " + true_block.PrintInSentence();
+        return str;
+    }
 }

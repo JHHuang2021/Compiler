@@ -6,4 +6,9 @@ public class IRBool extends IRType {
         super("bool", 1);
     }
 
+    @Override
+    public IRType FatherType() {
+        return this;
+    }
+
 }

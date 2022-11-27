@@ -1,7 +1,6 @@
 package Backend.IR.IRInstr;
 
 import Backend.IR.IRValue.IRValue;
-import Backend.IR.IRValue.Register;
 import Frontend.AST.LogicExprNode.LogicOpType;
 
 public class IRCmp extends IRInstr {
@@ -14,5 +13,12 @@ public class IRCmp extends IRInstr {
         this.op_type = op_type;
         this.lhs = lhs;
         this.rhs = rhs;
+    }
+
+    @Override
+    public String ToString() {
+        String str = dest.ToString() + " = icmp " + op_type.toString();
+        str += lhs.type.ToString() + " " + lhs.ToString() + ", " + rhs.ToString();
+        return str;
     }
 }

@@ -6,4 +6,9 @@ public class IRVoid extends IRType {
         super("void", 0);
     }
 
+    @Override
+    public IRType FatherType() {
+        return this;
+    }
+
 }

@@ -10,4 +10,9 @@ public class Constant extends IRValue {
         this.val = val;
     }
 
+    @Override
+    public String ToString() {
+        return "i32 " + String.valueOf(val);
+    }
+
 }

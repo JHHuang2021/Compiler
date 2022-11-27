@@ -19,6 +19,7 @@ public class Type {
 
     public Type(String type_name) {
         this.type_name = type_name;
+        this.dim = 0;
     }
 
     public Type(Type type, int dim) {

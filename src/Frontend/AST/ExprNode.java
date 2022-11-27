@@ -7,7 +7,6 @@ import Util.position;
 public abstract class ExprNode extends ASTNode {
     public Type type;
     public IRValue val = null;
-    // public entity val;
 
     public ExprNode(position pos) {
         super(pos);

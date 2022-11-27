@@ -9,4 +9,12 @@ public class IRStore extends IRInstr {
         this.lhs = lhs;
         this.rhs = rhs;
     }
+
+    @Override
+    public String ToString() {
+        String str = "";
+        str += "store " + rhs.type.ToString() + " " + rhs.ToString() + ", " + lhs.type.ToString() + " "
+                + lhs.ToString();
+        return str;
+    }
 }

@@ -18,8 +18,8 @@ public class StringConst extends IRValue {
     }
 
     public String Declare() {
-        String decl = "@str_" + ind + " = global";
-
-        return decl;
+        String str = "@str_" + ind + " = private unnamed_addr constant ";
+        str += "[" + (s.length() + 1) + " x " + "i8" + ']' + " c\"" + s + "\\00\"";
+        return str;
     }
 }

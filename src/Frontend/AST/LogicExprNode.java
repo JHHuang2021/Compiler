@@ -7,7 +7,7 @@ public class LogicExprNode extends ExprNode {
     public ExprNode lhs, rhs;
 
     public enum LogicOpType {
-        eq, neq, le, ge, leq, geq, not, andand, oror
+        eq, ne, slt, sle, sgt, sge, not, andand, oror
     }
 
     public LogicOpType op_code;

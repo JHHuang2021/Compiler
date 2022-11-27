@@ -267,7 +267,10 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
         TypeNode type = null;
         if (ctx.type() != null)
             type = (TypeNode) visit(ctx.type());
-        FunctionNode node = new FunctionNode(new position(ctx), type.type, ctx.Identifier().getText());
+        Type t = null;
+        if (type != null)
+            t = type.type;
+        FunctionNode node = new FunctionNode(new position(ctx), t, ctx.Identifier().getText());
         for (int i = 0; i < ctx.suite().statement().size(); i++)
             node.stmts.add((StmtNode) visit(ctx.suite().statement(i)));
         for (int i = 0; i < ctx.argDef().Identifier().size(); i++) {
@@ -347,19 +350,19 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
                 logicOp = LogicOpType.eq;
                 break;
             case "!=":
-                logicOp = LogicOpType.neq;
+                logicOp = LogicOpType.ne;
                 break;
             case "<":
-                logicOp = LogicOpType.le;
+                logicOp = LogicOpType.slt;
                 break;
             case ">":
-                logicOp = LogicOpType.ge;
+                logicOp = LogicOpType.sgt;
                 break;
             case "<=":
-                logicOp = LogicOpType.leq;
+                logicOp = LogicOpType.sle;
                 break;
             case ">=":
-                logicOp = LogicOpType.geq;
+                logicOp = LogicOpType.sge;
                 break;
             case "!":
                 logicOp = LogicOpType.not;
@@ -390,19 +393,19 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
                 logicOp = BinaryOpType.sub;
                 break;
             case "*":
-                logicOp = BinaryOpType.star;
+                logicOp = BinaryOpType.mul;
                 break;
             case "/":
-                logicOp = BinaryOpType.div;
+                logicOp = BinaryOpType.sdiv;
                 break;
             case "%":
-                logicOp = BinaryOpType.mod;
+                logicOp = BinaryOpType.srem;
                 break;
             case "<<":
-                logicOp = BinaryOpType.lshift;
+                logicOp = BinaryOpType.shl;
                 break;
             case ">>":
-                logicOp = BinaryOpType.rshift;
+                logicOp = BinaryOpType.ashr;
                 break;
             case "^":
                 logicOp = BinaryOpType.xor;
@@ -449,8 +452,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitExprArray(MxParser.ExprArrayContext ctx) {
         ExprArrayNode node = new ExprArrayNode(new position(ctx));
-        node.expr=(ExprNode)visit(ctx.expression(0));
-        node.offset=(ExprNode)visit(ctx.expression(1));
+        node.expr = (ExprNode) visit(ctx.expression(0));
+        node.offset = (ExprNode) visit(ctx.expression(1));
         return node;
     }
 

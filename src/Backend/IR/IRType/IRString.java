@@ -12,4 +12,9 @@ public class IRString extends IRType {
         return "i8*";
     }
 
+    @Override
+    public IRType FatherType() {
+        return this;
+    }
+
 }

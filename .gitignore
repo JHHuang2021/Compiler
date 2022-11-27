@@ -1,4 +1,4 @@
-/sema
+/testcases
 /.antlr
 /.vscode
 /lib
@@ -6,3 +6,4 @@
 test.mx
 test.out
 result.out
+

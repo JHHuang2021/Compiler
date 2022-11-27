@@ -18,6 +18,10 @@ public class IRBlock {
         return this.tag + ":";
     }
 
+    public String PrintInSentence() {
+        return '%' + this.tag;
+    }
+
     public void accept(ASMBuilder visitor) {
         // visitor.accept(this);
     }

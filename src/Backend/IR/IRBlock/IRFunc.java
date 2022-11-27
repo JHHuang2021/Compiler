@@ -3,12 +3,11 @@ package Backend.IR.IRBlock;
 import java.util.ArrayList;
 
 import Backend.IR.IRType.IRType;
-import Backend.IR.IRValue.IRValue;
 import Backend.IR.IRValue.Register;
 
 public class IRFunc {
     public ArrayList<IRBlock> blocks = new ArrayList<>();
-    public ArrayList<IRValue> args = new ArrayList<>();
+    public ArrayList<Register> args = new ArrayList<>();
     public String func_name;
     public IRType ret_type;
     public Register this_ptr = null;
@@ -17,5 +16,16 @@ public class IRFunc {
     public IRFunc(String func_name, IRType ret_type) {
         this.func_name = func_name;
         this.ret_type = ret_type;
+    }
+
+    public String Declare(boolean flag) {
+        String str = flag ? "declare " : "define ";
+        str += ret_type.ToString() + " @" + func_name + '(';
+        for (int i = 0; i < args.size(); i++)
+            str += args.get(i).type.ToString() + " "
+                    + args.get(i).ToString()+args.get(i).type.PrintArgs()
+                    + (i != args.size() - 1 ? ", " : "");
+        str += ")";
+        return str;
     }
 }

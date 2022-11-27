@@ -7,10 +7,12 @@ import java.util.HashMap;
 
 import org.antlr.v4.runtime.misc.Pair;
 
+import Backend.IR.IRValue.Register;
+
 public class Scope {
 
     private HashMap<String, Type> members;
-    // public HashMap<String, register> entities = new HashMap<>();
+    private HashMap<String, Register> entities = new HashMap<>();
     public Type return_type = null;
     public boolean if_in_lambda = false;
     private Scope parent_scope;
@@ -78,5 +80,25 @@ public class Scope {
         } else if (parent_scope != null && lookUpon)
             return parent_scope.GetVaribleType(name, true);
         return null;
+    }
+
+    public void DefineVarible(String name, Register val) {
+        entities.put(name, val);
+    }
+
+    public Pair<Register, Boolean> GetVaribleVal(String name, boolean lookUpon) {
+        if (entities.containsKey(name)) {
+            return new Pair<>(entities.get(name), true);
+        } else if (parent_scope != null && (lookUpon || this.scopeType != ScopeType.FUNC))
+            return parent_scope.GetVaribleVal(name, true);
+        return new Pair<>(null, false);
+    }
+
+    public boolean IfInFunc() {
+        if (scopeType == ScopeType.FUNC)
+            return true;
+        else if (parent_scope != null)
+            return parent_scope.IfInFunc();
+        return false;
     }
 }

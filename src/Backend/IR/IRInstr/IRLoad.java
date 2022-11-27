@@ -13,4 +13,12 @@ public class IRLoad extends IRInstr {
         this.dest = dest;
         this.reg_addr = reg_addr;
     }
+
+    @Override
+    public String ToString() {
+        String str = "";
+        str += dest.ToString() + " = load " + dest.type.ToString() + ", " + reg_addr.type.ToString() + " "
+                + reg_addr.ToString();
+        return str;
+    }
 }

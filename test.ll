@@ -1,26 +1,24 @@
-; ModuleID = 'test.cpp'
-source_filename = "test.cpp"
-target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
-target triple = "x86_64-pc-linux-gnu"
-
-; Function Attrs: noinline norecurse nounwind optnone uwtable
-define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i8, align 1
-  %3 = alloca i8, align 1
-  store i32 0, i32* %1, align 4
-  %4 = load i8, i8* %2, align 1
-  %5 = trunc i8 %4 to i1
-  %6 = xor i1 %5, true
-  %7 = zext i1 %6 to i8
-  store i8 %7, i8* %3, align 1
-  ret i32 0
+declare void @__builtin_print(i8* %s_0)
+declare void @__builtin_println(i8* %s_0)
+declare void @__builtin_printInt(i32 %int_0)
+declare void @__builtin_printlnInt(i32 %int_0)
+declare i32 @__builtin_getInt()
+declare i8* @__builtin_getString()
+declare i8* @__builtin_toString(i32 %int_0)
+declare i8* @__builtin_malloc(i32 %size_0)
+declare i8* @__builtin_str_add(i8* %lhs_0, i8* %rhs_1)
+declare i1 @__builtin_str_eq(i8* %lhs_0, i8* %rhs_1)
+declare i1 @__builtin_str_ne(i8* %lhs_0, i8* %rhs_1)
+declare i1 @__builtin_str_gt(i8* %lhs_0, i8* %rhs_1)
+declare i1 @__builtin_str_ge(i8* %lhs_0, i8* %rhs_1)
+declare i1 @__builtin_str_lt(i8* %lhs_0, i8* %rhs_1)
+declare i1 @__builtin_str_le(i8* %lhs_0, i8* %rhs_1)
+declare i32 @__builtin_length(i8* %this_0)
+declare i8* @__builtin_substring(i8* %this_0, i32 %left_1, i32 %right_2)
+declare i32 @__builtin_parseInt(i8* %this_0)
+declare i32 @__builtin_ord(i8* %this_0, i32 %pos_1)
+define i32 @main()
+{
+main_0:
+	%var_def_3 = alloca [2 x [3 x i32]]
 }
-
-attributes #0 = { noinline norecurse nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-
-!llvm.module.flags = !{!0}
-!llvm.ident = !{!1}
-
-!0 = !{i32 1, !"wchar_size", i32 4}
-!1 = !{!"clang version 10.0.0-4ubuntu1 "}

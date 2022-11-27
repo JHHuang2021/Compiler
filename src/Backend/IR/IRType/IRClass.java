@@ -20,6 +20,20 @@ public class IRClass extends IRType {
     }
 
     public String ToString() {
-        return "%" + name;
+        return "%class." + name;
+    }
+
+    public String Declare() {
+        String str = ToString();
+        str += " = type { ";
+        for (int i = 0; i < var_type.size(); i++)
+            str += var_type.get(i).ToString() + ((i != var_type.size() - 1) ? ", " : "");
+        str += " }";
+        return str;
+    }
+
+    @Override
+    public IRType FatherType() {
+        return this;
     }
 }

@@ -393,10 +393,23 @@ public class SemanticChecker implements ASTVisitor {
                 it.type = global_scope.ContainType(calledFunc.ret_type.type_name, it.pos);
             else
                 it.type = global_scope.ContainType("int", it.pos);
-            if (calledFunc != null)
+            if (calledFunc != null) {
+                it.type = new Type(calledFunc.ret_type, 0);
                 it.type.dim = calledFunc.ret_type.dim;
+            }
             if_in_class = false;
-            // TODO judge args
+            for (int i = 0; i < it.args.size(); i++) {
+                it.args.get(i).accept(this);
+                if (!it.args.get(i).type.Equal(calledFunc.args.get(i).var.get(0).type)) {
+                    Type l = calledFunc.args.get(i).var.get(0).type;
+                    if (it.args.get(i).type.type_name.equals("Null") && (l.dim == 0
+                            && (l.type_name.equals("int") || l.type_name.equals("bool")
+                                    || l.type_name.equals("string"))))
+                        throw new semanticError("null cannot be assigned to primitive type variable", it.pos);
+                    else if (!it.args.get(i).type.type_name.equals("Null"))
+                        throw new semanticError("type not match", it.pos);
+                }
+            }
             return;
         }
         if (current_class != null) {
@@ -426,8 +439,10 @@ public class SemanticChecker implements ASTVisitor {
             } else {
                 it.type = global_scope.ContainType("int", it.pos);
             }
-            if (calledFunc != null)
+            if (calledFunc != null) {
+                it.type = new Type(calledFunc.ret_type, 0);
                 it.type.dim = calledFunc.ret_type.dim;
+            }
 
             // current_class = null;
             return;
@@ -451,6 +466,7 @@ public class SemanticChecker implements ASTVisitor {
             }
         }
         it.type = global_scope.ContainType(calledFunc.ret_type.type_name, it.pos);
+        it.type = new Type(calledFunc.ret_type, 0);
         it.type.dim = calledFunc.ret_type.dim;
     }
 

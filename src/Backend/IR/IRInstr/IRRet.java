@@ -8,4 +8,11 @@ public class IRRet extends IRInstr {
     public IRRet(IRValue val) {
         this.ret_val = val;
     }
+
+    @Override
+    public String ToString() {
+        String str = "";
+        str += "ret " + ret_val.type.ToString() + " " + ret_val.ToString();
+        return str;
+    }
 }

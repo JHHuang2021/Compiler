@@ -9,24 +9,29 @@ import Util.MxErrorListener;
 import Util.GlobalScope;
 import Util.error.error;
 
-// import java.io.FileInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 // import java.util.Scanner;
+import java.io.PrintStream;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import Backend.IR.IRBuilder;
+import Backend.IR.IRPrinter;
 import Frontend.AST.RootNode;
 import Frontend.*;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        // String name = "test.mx";
-        // InputStream input = new FileInputStream(name);
+        String name = "test.mx";
+        InputStream input = new FileInputStream(name);
 
-        InputStream input = System.in;
+        // PrintStream errprint = new PrintStream("err.txt");
+        // System.setErr(errprint);
+
+        // InputStream input = System.in;
 
         try {
             RootNode ASTRoot;
@@ -54,8 +59,9 @@ public class Compiler {
             new SemanticChecker(global_scope).visit(ASTRoot);
 
             // mainFn f = new mainFn();
-            new IRBuilder().visit(ASTRoot);
-            // new IRPrinter(System.out).visitFn(f);
+            IRBuilder ir_builder = new IRBuilder(global_scope);
+            ir_builder.visit(ASTRoot);
+            new IRPrinter("test.ll", ir_builder.global);
 
             // AsmFn asmF = new AsmFn();
             // new InstSelector(asmF).visitFn(f);

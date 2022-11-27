@@ -9,11 +9,19 @@ public class IRBin extends IRInstr {
     public BinaryOpType op;
     public IRValue lhs, rhs;
 
-    public IRBin(IRValue val,BinaryOpType op,IRValue lhs,IRValue rhs){
+    public IRBin(IRValue val, BinaryOpType op, IRValue lhs, IRValue rhs) {
         super();
-        this.val=val;
-        this.op=op;
-        this.lhs=lhs;
-        this.rhs=rhs;
+        this.val = val;
+        this.op = op;
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+
+    @Override
+    public String ToString() {
+        String str = val.ToString() + " = ";
+        str += op.toString() + " " + val.type.ToString() + " ";
+        str += lhs.ToString() + ", " + rhs.ToString();
+        return str;
     }
 }

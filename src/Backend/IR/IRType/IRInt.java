@@ -6,4 +6,9 @@ public class IRInt extends IRType {
         super("int", 32);
     }
 
+    @Override
+    public IRType FatherType() {
+        return this;
+    }
+
 }

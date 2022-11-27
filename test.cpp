@@ -1,5 +1,7 @@
+
+
 int main() {
-    bool a;
-    bool b = !a;
+    int n = 10;
+    int *a = new int[n];
     return 0;
 }

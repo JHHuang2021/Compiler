@@ -13,7 +13,19 @@ abstract public class IRType {
         return size != 0 ? "i" + size : name;
     }
 
+    public String GetType() {
+        return ToString();
+    }
+
     public int GetSize() {
         return size;
+    }
+
+    public IRType FatherType() {
+        return null;
+    }
+
+    public String PrintArgs() {
+        return "";
     }
 }
