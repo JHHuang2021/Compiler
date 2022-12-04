@@ -67,22 +67,22 @@ bool __builtin_str_ne(char* a, char *b)
     return strcmp(a, b) != 0;
 }
 
-bool __builtin_str_gt(char* a, char* b)
+bool __builtin_str_sgt(char* a, char* b)
 {
     return strcmp(a, b) > 0;
 }
 
-bool __builtin_str_ge(char* a, char* b)
+bool __builtin_str_sge(char* a, char* b)
 {
     return strcmp(a, b) >= 0;
 }
 
-bool __builtin_str_lt(char* a, char* b)
+bool __builtin_str_slt(char* a, char* b)
 {
     return strcmp(a, b) < 0;
 }
 
-bool __builtin_str_le(char* a, char* b)
+bool __builtin_str_sle(char* a, char* b)
 {
     return strcmp(a, b) <= 0;
 }

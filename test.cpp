@@ -1,7 +1,6 @@
+struct A {
+    int a;
+};
+A a;
 
-
-int main() {
-    int n = 10;
-    int *a = new int[n];
-    return 0;
-}
+int main() { return 0; }

@@ -163,7 +163,7 @@ define dso_local zeroext i1 @__builtin_str_ne(i8* %0, i8* %1) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local zeroext i1 @__builtin_str_gt(i8* %0, i8* %1) #0 {
+define dso_local zeroext i1 @__builtin_str_sgt(i8* %0, i8* %1) #0 {
   %3 = alloca i8*, align 8
   %4 = alloca i8*, align 8
   store i8* %0, i8** %3, align 8
@@ -176,7 +176,7 @@ define dso_local zeroext i1 @__builtin_str_gt(i8* %0, i8* %1) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local zeroext i1 @__builtin_str_ge(i8* %0, i8* %1) #0 {
+define dso_local zeroext i1 @__builtin_str_sge(i8* %0, i8* %1) #0 {
   %3 = alloca i8*, align 8
   %4 = alloca i8*, align 8
   store i8* %0, i8** %3, align 8
@@ -189,7 +189,7 @@ define dso_local zeroext i1 @__builtin_str_ge(i8* %0, i8* %1) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local zeroext i1 @__builtin_str_lt(i8* %0, i8* %1) #0 {
+define dso_local zeroext i1 @__builtin_str_slt(i8* %0, i8* %1) #0 {
   %3 = alloca i8*, align 8
   %4 = alloca i8*, align 8
   store i8* %0, i8** %3, align 8
@@ -202,7 +202,7 @@ define dso_local zeroext i1 @__builtin_str_lt(i8* %0, i8* %1) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local zeroext i1 @__builtin_str_le(i8* %0, i8* %1) #0 {
+define dso_local zeroext i1 @__builtin_str_sle(i8* %0, i8* %1) #0 {
   %3 = alloca i8*, align 8
   %4 = alloca i8*, align 8
   store i8* %0, i8** %3, align 8

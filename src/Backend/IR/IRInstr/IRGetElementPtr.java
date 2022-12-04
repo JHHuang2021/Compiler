@@ -1,5 +1,6 @@
 package Backend.IR.IRInstr;
 
+import Backend.IR.IRType.IRString;
 import Backend.IR.IRType.IRType;
 import Backend.IR.IRValue.IRValue;
 import Backend.IR.IRValue.Register;
@@ -29,11 +30,12 @@ public class IRGetElementPtr extends IRInstr {
     public String ToString() {
         String str = "";
         if (offset == null)
-            str += reg.ToString() + " = getelementptr inbounds " + type.ToString() + ", " + expr.type.ToString() + " "
+            str += reg.ToString() + " = getelementptr inbounds " + type.ToString() + ", " + expr.type.ToString()
+                    + (expr.type instanceof IRString ? "*" : "") + " "
                     + expr.ToString() + ", i32 0, " + "i32 " + ind;
         else
             str += reg.ToString() + " = getelementptr inbounds " + type.GetType() + ", " + type.GetType() + "* "
-                    + expr.ToString() + ", i32 0, " + offset.ToString();
+                    + expr.ToString() + ", " + offset.type.ToString() + " " + offset.ToString();
 
         return str;
     }

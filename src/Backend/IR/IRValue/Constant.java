@@ -12,7 +12,7 @@ public class Constant extends IRValue {
 
     @Override
     public String ToString() {
-        return "i32 " + String.valueOf(val);
+        return String.valueOf(val);
     }
 
 }

@@ -4,12 +4,14 @@ public class IRString extends IRType {
     public int length;
 
     public IRString(int length) {
-        super("", 32);
+        super("string", 32);
         this.length = length;
     }
 
     public String ToString() {
-        return "i8*";
+        if (length == -1)
+            return "i8*";
+        else return "["+(length+1)+" x i8]";
     }
 
     @Override

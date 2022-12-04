@@ -3,10 +3,11 @@ package Frontend.AST;
 import Util.position;
 
 public class ForStmtNode extends StmtNode {
-    public ExprNode var, condition, step;
+    public StmtNode var;
+    public ExprNode condition, step;
     public SuiteStmtNode for_suite;
 
-    public ForStmtNode(ExprNode var, ExprNode condition, ExprNode step, SuiteStmtNode for_suite, position pos) {
+    public ForStmtNode(StmtNode var, ExprNode condition, ExprNode step, SuiteStmtNode for_suite, position pos) {
         super(pos);
         this.var = var;
         this.condition = condition;

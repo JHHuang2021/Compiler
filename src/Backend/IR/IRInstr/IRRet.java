@@ -1,5 +1,6 @@
 package Backend.IR.IRInstr;
 
+import Backend.IR.IRType.IRVoid;
 import Backend.IR.IRValue.IRValue;
 
 public class IRRet extends IRInstr {
@@ -12,7 +13,7 @@ public class IRRet extends IRInstr {
     @Override
     public String ToString() {
         String str = "";
-        str += "ret " + ret_val.type.ToString() + " " + ret_val.ToString();
+        str += "ret " + ret_val.type.ToString() + (ret_val.type instanceof IRVoid ? "" : " " + ret_val.ToString());
         return str;
     }
 }

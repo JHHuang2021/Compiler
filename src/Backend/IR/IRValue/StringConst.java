@@ -19,7 +19,9 @@ public class StringConst extends IRValue {
 
     public String Declare() {
         String str = "@str_" + ind + " = private unnamed_addr constant ";
-        str += "[" + (s.length() + 1) + " x " + "i8" + ']' + " c\"" + s + "\\00\"";
+        str += "[" + (s.length() + 1) + " x " + "i8" + ']' + " c";
+        str += "\"" + s.replace("\\", "\\5C").replace("\n", "\\0A").replace("\"", "\\22").replace("\0", "\\00") + "\\00"
+                + "\"";
         return str;
     }
 }

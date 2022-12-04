@@ -104,11 +104,12 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     public ASTNode visitForStmt(MxParser.ForStmtContext ctx) {
         SuiteStmtNode forSuite = null;
-        ExprNode forexpr1 = null, forexpr2 = null, forexpr3 = null;
+        StmtNode forexpr1 = null;
+        ExprNode forexpr2 = null, forexpr3 = null;
         if (ctx.forexpr1().varDef() != null)
-            forexpr1 = (ExprNode) visit(ctx.forexpr1().varDef());
+            forexpr1 = (StmtNode) visit(ctx.forexpr1().varDef());
         else if (ctx.forexpr1().expression() != null)
-            forexpr1 = (ExprNode) visit(ctx.forexpr1().expression());
+            forexpr1 = new ExprStmtNode((ExprNode) visit(ctx.forexpr1().expression()), new position(ctx));
 
         if (ctx.forexpr2 != null)
             forexpr2 = (ExprNode) visit(ctx.forexpr2);
@@ -289,7 +290,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
         else if (ctx.BoolConstant() != null) {
             String bool_constant = ctx.BoolConstant().getText();
             boolean value = false;
-            if (bool_constant == "true")
+            if (bool_constant.equals("true"))
                 value = true;
             return new ConstExprNode<Boolean>(value, new position(ctx));
         } else if (ctx.StringConstant() != null) {

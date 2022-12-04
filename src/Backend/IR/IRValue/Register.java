@@ -1,6 +1,7 @@
 package Backend.IR.IRValue;
 
 import Backend.IR.IRType.IRPointer;
+import Backend.IR.IRType.IRString;
 import Backend.IR.IRType.IRType;
 
 public class Register extends IRValue {
@@ -22,7 +23,7 @@ public class Register extends IRValue {
     public String Declare() {
         String str = ToString();
         if (is_global)
-            str += " = global " + ((IRPointer) type).father_type.ToString();
+            str += " = global " + type.FatherType().ToString() + (type.FatherType() instanceof IRString ? " null" : " zeroinitializer");
         else
             str += " = alloca " + type.ToString();
         return str;

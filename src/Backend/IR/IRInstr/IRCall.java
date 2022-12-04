@@ -21,10 +21,10 @@ public class IRCall extends IRInstr {
             str += val.ToString() + " = ";
         str += "call ";
         str += val != null ? val.type.ToString() : "void";
-        str += " " + func_name + "(";
+        str += " @" + func_name + "(";
         for (int i = 0; i < args.size(); i++) {
             IRValue val = args.get(i);
-            str += val.type.ToString() + " " + val.ToString() + val.type.PrintArgs();
+            str += val.type.ToString() + " " + val.ToString();
             if (i != args.size() - 1)
                 str += ", ";
         }

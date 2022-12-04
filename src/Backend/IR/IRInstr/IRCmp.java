@@ -1,5 +1,8 @@
 package Backend.IR.IRInstr;
 
+import java.io.Console;
+
+import Backend.IR.IRValue.Constant;
 import Backend.IR.IRValue.IRValue;
 import Frontend.AST.LogicExprNode.LogicOpType;
 
@@ -17,8 +20,13 @@ public class IRCmp extends IRInstr {
 
     @Override
     public String ToString() {
-        String str = dest.ToString() + " = icmp " + op_type.toString();
-        str += lhs.type.ToString() + " " + lhs.ToString() + ", " + rhs.ToString();
+        String str = dest.ToString() + " = icmp " + op_type.toString() + " ";
+        // if (!(lhs instanceof Constant))
+        str += lhs.type.ToString() + " ";
+        str += lhs.ToString() + ", ";
+        // if (!(rhs instanceof Constant))
+        // str += rhs.type.ToString() + " ";
+        str += rhs.ToString();
         return str;
     }
 }

@@ -1,18 +1,19 @@
 grammar Mx;
 
-program: (classDef | funcDef | varDef)*;
+program: (classDef | funcDef | (varDef ';'))*;
 
 varDef:
 	type Identifier ('=' expression)? (
 		',' Identifier ('=' expression)?
-	)* ';';
-classDef: Class Identifier '{' (varDef | funcDef)* '}' ';';
+	)*;
+classDef:
+	Class Identifier '{' ((varDef ';') | funcDef)* '}' ';';
 
 suite: '{' statement* '}';
 body: (suite | statement);
 forexpr1: (varDef | expression)?;
 statement:
-	varDef				# vardefStmt
+	varDef ';'			# vardefStmt
 	| expression ';'	# pureExprStmt
 	| suite				# block
 	| If '(' expression ')' thensent = body (

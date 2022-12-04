@@ -24,8 +24,4 @@ abstract public class IRType {
     public IRType FatherType() {
         return null;
     }
-
-    public String PrintArgs() {
-        return "";
-    }
 }
